@@ -5,7 +5,7 @@ FROM eclipse-temurin:21.0.4_7-jre-ubi9-minimal
 WORKDIR /app
 
 # Copy the JAR file built from your Spring Boot project
-# COPY ./backend/target/*.jar app.jar
+COPY ./build/libs/*.jar app.jar
 
 # Expose port 9090 for the Spring Boot application
 EXPOSE 9090
