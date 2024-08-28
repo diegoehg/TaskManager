@@ -2,9 +2,10 @@
   "name": "task-manager-frontend",
   "version": "0.0.1",
   "description": "Task Manager Frontend",
-  "main": "index.js",
+  "source": "index.html",
   "scripts": {
     "start": "parcel index.html -p 3000",
+    "build": "parcel build index.html --no-cache",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Diego Hernandez",

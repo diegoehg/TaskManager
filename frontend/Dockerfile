@@ -1,20 +1,23 @@
 # Use a Node.js image as the base
-FROM node:22-alpine3.19
+FROM node:20.17.0-alpine3.19
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Copy package.json and package-lock.json (if it exists)
-#COPY ./package*.json ./
+COPY ./package*.json ./
+
+# Clear npm cache
+RUN npm cache clean --force
 
 # Install dependencies
-# RUN npm install
+RUN npm install
 
 # Copy the rest of the frontend application code
-# COPY ./ .
+COPY ./ .
 
 # Build the React application
-# RUN npm run build
+RUN npm run build
 
 # Expose the port the React app will run on
 EXPOSE 3000
