@@ -1,0 +1,21 @@
+{
+  "name": "task-manager-frontend",
+  "version": "0.0.1",
+  "description": "Task Manager Frontend",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html -p 3000",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Diego Hernandez",
+  "license": "ISC",
+  "dependencies": {
+    "help": "^3.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "parcel": "^2.12.0",
+    "process": "^0.11.10"
+  }
+}
