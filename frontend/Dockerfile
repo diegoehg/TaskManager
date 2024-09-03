@@ -14,7 +14,7 @@ RUN npm cache clean --force
 RUN npm install
 
 # Copy the rest of the frontend application code
-COPY ./ .
+COPY ./index.* .
 
 # Build the React application
 RUN npm run build
