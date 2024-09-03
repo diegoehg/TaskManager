@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: ./backend  # Path to the backend Dockerfile
+    image: task-manager-backend:latest
+    container_name: task-manager-backend
+    ports:
+      - "9090:9090"  # Map host port 9090 to container port 9090
+
+  frontend:
+    build:
+      context: ./frontend  # Path to the frontend Dockerfile
+    image: task-manager-frontend:latest
+    container_name: task-manager-frontend
+    ports:
+      - "3000:3000"  # Map host port 3000 to container port 3000
+    depends_on:
+      - backend  # Start the backend service before the frontend service
