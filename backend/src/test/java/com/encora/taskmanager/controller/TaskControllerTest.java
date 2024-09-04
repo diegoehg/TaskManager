@@ -51,7 +51,7 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name())) // Verify status
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully")) // Verify message
-                .andExpect(jsonPath("$.content.content", hasSize(2))); // Verify 2 tasks are returned in content
+                .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks are returned in content
     }
 
     @Test
@@ -88,6 +88,6 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully"))
-                .andExpect(jsonPath("$.content.content", hasSize(2))); // Verify 2 tasks in the page content
+                .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks in the page content
     }
 }
