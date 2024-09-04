@@ -36,8 +36,8 @@ public class TaskControllerTest {
         // Mock data
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), false),
-                        new Task(2L, "Task 2", LocalDate.of(2024, 11, 24), true)
+                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
+                        new Task(2L, "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
                 ),
                 Pageable.ofSize(2).withPage(0),
                 10 // Total elements (assume 10 for this example)
@@ -71,8 +71,8 @@ public class TaskControllerTest {
         // Mock data for page 0, size 2
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), false),
-                        new Task(2L, "Task 2", LocalDate.of(2024, 11, 24), true)
+                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
+                        new Task(2L, "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
                 ),
                 Pageable.ofSize(2).withPage(0),
                 10 // Total elements (assume 10 for this example)
