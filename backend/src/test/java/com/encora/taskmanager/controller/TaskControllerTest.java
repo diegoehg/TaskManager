@@ -1,5 +1,6 @@
 package com.encora.taskmanager.controller;
 
+import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.GenericResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.service.TaskService;
@@ -44,5 +45,17 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name())) // Verify status
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully")) // Verify message
                 .andExpect(jsonPath("$.content", hasSize(2))); // Verify 2 tasks are returned in content
+    }
+
+    @Test
+    public void shouldReturn500WhenServiceThrowsTaskManagerException() throws Exception {
+        when(taskService.getAllTasks()).thenThrow(new TaskManagerException("Error retrieving tasks"));
+
+        mockMvc.perform(get("/api/tasks")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError()) // Expect a 500 error
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
+                .andExpect(jsonPath("$.message").value("Error retrieving tasks"));
     }
 }
