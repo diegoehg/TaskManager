@@ -90,4 +90,29 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully"))
                 .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks in the page content
     }
+
+    @Test
+    public void shouldReturnFilteredListOfTasks() throws Exception {
+        // Mock data for PENDING and IN_PROGRESS tasks
+        Page<Task> taskPage = new PageImpl<>(
+                List.of(
+                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
+                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.IN_PROGRESS)
+                ),
+                Pageable.ofSize(10).withPage(0),
+                2 // Total elements
+        );
+        when(taskService.getTasksByStatusIn(List.of(Task.Status.PENDING, Task.Status.IN_PROGRESS), Pageable.ofSize(10).withPage(0)))
+                .thenReturn(taskPage);
+
+        // Perform GET request with filtering by status
+        mockMvc.perform(get("/api/tasks")
+                        .param("status", "PENDING,IN_PROGRESS")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value("Tasks retrieved successfully"))
+                .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks are returned
+    }
 }

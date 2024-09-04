@@ -4,6 +4,10 @@ import com.encora.taskmanager.model.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface TaskService {
     Page<Task> getAllTasks(Pageable pageable);
+
+    Page<Task> getTasksByStatusIn(List<Task.Status> statuses, Pageable pageable);
 }
