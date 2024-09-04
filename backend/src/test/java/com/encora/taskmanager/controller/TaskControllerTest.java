@@ -36,7 +36,7 @@ public class TaskControllerTest {
         when(taskService.getAllTasks()).thenReturn(tasks);
 
         // Perform GET request
-        mockMvc.perform(get("/tasks")
+        mockMvc.perform(get("/api/tasks")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
