@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -30,8 +31,8 @@ public class TaskControllerTest {
     public void shouldReturnListOfTasks() throws Exception {
         // Mock data
         List<Task> tasks = List.of(
-                new Task(1L, "Task 1", false),
-                new Task(2L, "Task 2", true)
+                new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), false),
+                new Task(2L, "Task 2", LocalDate.of(2024, 11, 24), true)
         );
         when(taskService.getAllTasks()).thenReturn(tasks);
 
