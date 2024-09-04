@@ -1,9 +1,9 @@
 package com.encora.taskmanager.service;
 
 import com.encora.taskmanager.model.Task;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TaskService {
-    List<Task> getAllTasks();
+    Page<Task> getAllTasks(Pageable pageable);
 }
