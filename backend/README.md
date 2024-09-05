@@ -99,6 +99,18 @@ The endpoint returns a JSON object with the following structure:
    Example Request: `GET /api/tasks?dueDateAfter=2024-06-07&dueDateBefore=2024-12-31`
 
 
+5. Get Tasks Sorted by Due Date
+   Endpoint: /api/tasks
+   Method: GET
+   Parameters:
+
+   | Parameter | Type   | Required | Default | Description                                                                                                                            |
+   | --------- | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+   | sort      | string | No       | ASC     | The sorting direction for due date. Possible values are "ASC" (ascending) or "DESC" (descending). Defaults to "ASC" if not provided. |
+
+   Example Request: `GET /api/tasks?sort=DESC`
+
+
 ### Error Handling
 
 #### Internal Server Error (500)

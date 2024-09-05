@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -185,5 +186,51 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
                 .andExpect(jsonPath("$.data.content", hasSize(2)));
+    }
+
+    @Test
+    public void shouldReturnTasksSortedByDueDateAscending() throws Exception {
+        Page<Task> taskPage = new PageImpl<>(
+                List.of(
+                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
+                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
+                ),
+                Pageable.ofSize(10).withPage(0),
+                3
+        );
+        when(taskService.getTasksSortedByDueDate(Pageable.ofSize(10).withPage(0), Sort.Direction.ASC))
+                .thenReturn(taskPage);
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("sort", "ASC")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.data.content", hasSize(3)));
+    }
+
+    @Test
+    public void shouldReturnTasksSortedByDueDateDescending() throws Exception {
+        Page<Task> taskPage = new PageImpl<>(
+                List.of(
+                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING),
+                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED)
+                ),
+                Pageable.ofSize(10).withPage(0),
+                3
+        );
+        when(taskService.getTasksSortedByDueDate(Pageable.ofSize(10).withPage(0), Sort.Direction.DESC))
+                .thenReturn(taskPage);
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("sort", "DESC")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.data.content", hasSize(3)));
     }
 }

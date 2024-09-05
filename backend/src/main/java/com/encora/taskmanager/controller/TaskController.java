@@ -7,6 +7,7 @@ import com.encora.taskmanager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,8 @@ public class TaskController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "dueDateAfter", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueDateAfter,
-            @RequestParam(value = "dueDateBefore", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueDateBefore
+            @RequestParam(value = "dueDateBefore", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueDateBefore,
+            @RequestParam(value = "sort", required = false) String sort
     ) {
         try {
             Pageable pageable = Pageable.ofSize(size).withPage(page);
@@ -43,6 +45,9 @@ public class TaskController {
                 tasks = taskService.getTasksByStatusIn(statuses, pageable);
             } else if (dueDateAfter != null || dueDateBefore != null) {
                 tasks = taskService.getTasksByDueDateRange(dueDateAfter, dueDateBefore, pageable);
+            } else if (sort != null) {
+                Sort.Direction sortDirection = Sort.Direction.fromString(sort.toUpperCase());
+                tasks = taskService.getTasksSortedByDueDate(pageable, sortDirection);
             } else {
                 tasks = taskService.getAllTasks(pageable);
             }
