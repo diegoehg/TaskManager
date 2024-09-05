@@ -86,6 +86,18 @@ The endpoint returns a JSON object with the following structure:
 
    Example Request: `GET /api/tasks?page=0&size=5&status=IN_PROGRESS`
 
+4. Get Tasks Filtered by Due Date Range
+   Endpoint: /api/tasks
+   Method: GET
+   Parameters:
+
+   | Parameter     | Type            | Required | Default | Description                                                  |
+   |---------------|-----------------| -------- | ------- |--------------------------------------------------------------|
+   | dueDateAfter  | ISO date string | No       | 0       | ISO date (YYYY-MM-DD) after which to filter tasks due date.  |
+   | dueDateBefore | ISO date string | No       | 10      | ISO date (YYYY-MM-DD) before which to filter tasks due date. |
+
+   Example Request: `GET /api/tasks?dueDateAfter=2024-06-07&dueDateBefore=2024-12-31`
+
 
 ### Error Handling
 

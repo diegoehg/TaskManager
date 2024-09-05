@@ -115,4 +115,75 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully"))
                 .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks are returned
     }
+
+    @Test
+    public void shouldReturnTasksFilteredByDueDateAfter() throws Exception {
+        LocalDate dueDateAfter = LocalDate.parse("2024-09-14");
+        Page<Task> taskPage = new PageImpl<>(
+                List.of(
+                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
+                ),
+                Pageable.ofSize(10).withPage(0),
+                2
+        );
+        when(taskService.getTasksByDueDateRange(dueDateAfter, null, Pageable.ofSize(10).withPage(0)))
+                .thenReturn(taskPage);
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("dueDateAfter", "2024-09-14")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.data.content", hasSize(2)));
+    }
+
+    @Test
+    public void shouldReturnTasksFilteredByDueDateBefore() throws Exception {
+        LocalDate dueDateBefore = LocalDate.parse("2024-12-25");
+        Page<Task> taskPage = new PageImpl<>(
+                List.of(
+                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
+                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS)
+                ),
+                Pageable.ofSize(10).withPage(0),
+                2
+        );
+        when(taskService.getTasksByDueDateRange(null, dueDateBefore, Pageable.ofSize(10).withPage(0)))
+                .thenReturn(taskPage);
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("dueDateBefore", "2024-12-25")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.data.content", hasSize(2)));
+    }
+
+    @Test
+    public void shouldReturnTasksFilteredByDueDateBetween() throws Exception {
+        LocalDate dueDateAfter = LocalDate.parse("2024-09-25");
+        LocalDate dueDateBefore = LocalDate.parse("2025-04-05");
+        Page<Task> taskPage = new PageImpl<>(
+                List.of(
+                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
+                ),
+                Pageable.ofSize(10).withPage(0),
+                2
+        );
+        when(taskService.getTasksByDueDateRange(dueDateAfter, dueDateBefore, Pageable.ofSize(10).withPage(0)))
+                .thenReturn(taskPage);
+
+        mockMvc.perform(get("/api/tasks")
+                        .param("dueDateAfter", "2024-09-25")
+                        .param("dueDateBefore", "2025-04-05")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.data.content", hasSize(2)));
+    }
 }
