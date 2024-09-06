@@ -1,6 +1,6 @@
 # TaskManager Backend API Documentation
 
-## `/api/tasks`
+## GET `/api/tasks`
 This endpoint retrieves a list of tasks. It supports pagination and filtering by status.
 
 ### Response Structure
@@ -47,10 +47,13 @@ The endpoint returns a JSON object with the following structure:
 }
 ```
 
-### Endpoints
+### Usage
 1. Get All Tasks with Pagination
+
    Endpoint: `/api/tasks`
-   Method: GET 
+
+   Method: GET
+
    Parameters:
 
   | Parameter | Type | Required | Default | Description                               |
@@ -62,8 +65,11 @@ The endpoint returns a JSON object with the following structure:
 
 
 2. Get Tasks Filtered by Status
+
    Endpoint: /api/tasks
+
    Method: GET
+
    Parameters:
 
    | Parameter | Type   | Required | Default | Description                                                                                                                 |
@@ -74,8 +80,11 @@ The endpoint returns a JSON object with the following structure:
 
 
 3. Get Tasks with Pagination and Status Filtering
+
    Endpoint: /api/tasks
+
    Method: GET
+
    Parameters:
 
    | Parameter | Type   | Required | Default | Description                                                                                                                |
@@ -87,8 +96,11 @@ The endpoint returns a JSON object with the following structure:
    Example Request: `GET /api/tasks?page=0&size=5&status=IN_PROGRESS`
 
 4. Get Tasks Filtered by Due Date Range
+
    Endpoint: /api/tasks
+
    Method: GET
+
    Parameters:
 
    | Parameter     | Type            | Required | Default | Description                                                  |
@@ -100,8 +112,11 @@ The endpoint returns a JSON object with the following structure:
 
 
 5. Get Tasks Sorted by Due Date
+
    Endpoint: /api/tasks
+
    Method: GET
+
    Parameters:
 
    | Parameter | Type   | Required | Default | Description                                                                                                                            |
@@ -111,12 +126,10 @@ The endpoint returns a JSON object with the following structure:
    Example Request: `GET /api/tasks?sort=DESC`
 
 
-## `/api/tasks/:id`
+## GET `/api/tasks/:id`
 This endpoint retrieves a specific task
 
-Method: GET
-
-Parameters:
+### Parameters:
 
 | Parameter | Type   | Required | Description    |
 | --------- | ------ | -------- | --------------------  |
@@ -124,7 +137,7 @@ Parameters:
 
    Example Request: `GET /api/tasks/1`
 
- ### Response Structure
+### Response Structure
 
 #### (Success - 200 OK):
 ```json
