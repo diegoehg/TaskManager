@@ -11,4 +11,6 @@ public interface TaskService {
     Page<Task> getAllTasks(TaskFilter taskFilter, Pageable pageable);
 
     Optional<Task> getTaskById(Long id);
+
+    Task createTask(Task task);
 }

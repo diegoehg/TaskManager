@@ -5,6 +5,7 @@ import com.encora.taskmanager.model.GenericResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -91,6 +92,26 @@ public class TaskController {
                 );
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
+        } catch (TaskManagerException e) {
+            GenericResponse<Task> response = new GenericResponse<>(
+                    GenericResponse.Status.FAILED,
+                    e.getMessage(),
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/tasks")
+    public ResponseEntity<GenericResponse<Task>> createTask(@Valid @RequestBody Task task) {
+        try {
+            Task createdTask = taskService.createTask(task);
+            GenericResponse<Task> response = new GenericResponse<>(
+                    GenericResponse.Status.SUCCESS,
+                    "Task created successfully",
+                    createdTask
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (TaskManagerException e) {
             GenericResponse<Task> response = new GenericResponse<>(
                     GenericResponse.Status.FAILED,

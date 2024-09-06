@@ -162,6 +162,46 @@ This endpoint retrieves a specific task
 }
 ```
 
+## POST /api/tasks
+Creates a New Task with the details provided in the request body. The response will include the newly created task with 
+its generated ID.
+
+### Request Body
+```json
+{
+  "description": "string",
+  "dueDate": "date (YYYY-MM-DD)",
+  "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
+}
+```
+
+### Example Request
+```
+POST /api/tasks
+{
+    "description": "Finish project report",
+    "dueDate": "2024-12-25",
+    "status": "PENDING"
+}
+```
+
+### Response Structure
+
+#### (Success - 201 Created)
+```json
+{
+  "status": "SUCCESS",
+  "message": "Task created successfully",
+  "data": {
+    "id": "long",
+    "description": "string",
+    "dueDate": "date",
+    "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
+  }
+}
+```
+
+
 ## Error Handling
 
 ### Internal Server Error (500)

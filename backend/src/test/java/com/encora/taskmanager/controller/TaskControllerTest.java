@@ -5,6 +5,7 @@ import com.encora.taskmanager.model.GenericResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
@@ -34,6 +36,9 @@ public class TaskControllerTest {
 
     @MockBean
     private TaskService taskService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     public void shouldReturnListOfTasks() throws Exception {
@@ -310,5 +315,22 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("FAILED"))
                 .andExpect(jsonPath("$.message").value("Task not found with ID: " + taskId));
+    }
+
+    @Test
+    public void shouldCreateTask() throws Exception {
+        Task taskToCreate = new Task(null, "New Task", LocalDate.of(2024, 12, 31), Task.Status.PENDING);
+        Task createdTask = new Task(1L, "New Task", LocalDate.of(2024, 12, 31), Task.Status.PENDING);
+
+        when(taskService.createTask(taskToCreate)).thenReturn(createdTask);
+
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(taskToCreate)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.description").value("New Task"));
     }
 }
