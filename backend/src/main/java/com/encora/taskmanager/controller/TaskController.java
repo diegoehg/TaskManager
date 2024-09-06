@@ -39,10 +39,11 @@ public class TaskController {
     ) {
         try {
             Pageable pageable = Pageable.ofSize(size).withPage(page);
+            List<Task.Status> statuses = status != null ? convertToListStatus(status) : null;
             Sort.Direction sortDirection = sort != null ? Sort.Direction.fromString(sort.toUpperCase()) : null;
 
             TaskFilter taskFilter = new TaskFilter(
-                    status != null ? convertToListStatus(status) : null,
+                    statuses,
                     dueDateAfter,
                     dueDateBefore,
                     sortDirection
