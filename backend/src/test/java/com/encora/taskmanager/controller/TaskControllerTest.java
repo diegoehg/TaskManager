@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -281,5 +282,33 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
                 .andExpect(jsonPath("$.data.content", hasSize(1)));
+    }
+
+    @Test
+    public void shouldReturnTaskById() throws Exception {
+        long taskId = 1L;
+        Task task = new Task(taskId, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED);
+        when(taskService.getTaskById(taskId)).thenReturn(Optional.of(task));
+
+        mockMvc.perform(get("/api/tasks/{id}", taskId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.id").value(taskId))
+                .andExpect(jsonPath("$.data.description").value("Task 1"));
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenTaskNotFound() throws Exception {
+        long taskId = 999L;
+        when(taskService.getTaskById(taskId)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/tasks/{id}", taskId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.message").value("Task not found with ID: " + taskId));
     }
 }

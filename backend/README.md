@@ -111,9 +111,47 @@ The endpoint returns a JSON object with the following structure:
    Example Request: `GET /api/tasks?sort=DESC`
 
 
-### Error Handling
+## `/api/tasks/:id`
+This endpoint retrieves a specific task
 
-#### Internal Server Error (500)
+Method: GET
+
+Parameters:
+
+| Parameter | Type   | Required | Description    |
+| --------- | ------ | -------- | --------------------  |
+| id        | long   | Yes      | The ID of the task to retrieve. |
+
+   Example Request: `GET /api/tasks/1`
+
+ ### Response Structure
+
+#### (Success - 200 OK):
+```json
+{
+  "status": "SUCCESS",
+  "message": "Task retrieved successfully",
+  "data": {
+    "id": "long",
+    "description": "string",
+    "dueDate": "date",
+    "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
+  }
+}
+```
+
+#### (Not Found - 404):
+```json
+{
+   "status": "FAILED",
+   "message": "Task not found with ID: {id}",
+   "data": null
+}
+```
+
+## Error Handling
+
+### Internal Server Error (500)
 If an internal server error occurs, the endpoint will return a JSON response with the following structure:
 ```json
 {

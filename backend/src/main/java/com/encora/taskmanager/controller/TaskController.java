@@ -12,14 +12,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -72,5 +70,34 @@ public class TaskController {
         return Arrays.stream(status.split(","))
                 .map(s -> Task.Status.valueOf(s.trim().toUpperCase()))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/tasks/{id}")
+    public ResponseEntity<GenericResponse<Task>> getTaskById(@PathVariable Long id) {
+        try {
+            Optional<Task> task = taskService.getTaskById(id);
+            if (task.isPresent()) {
+                GenericResponse<Task> response = new GenericResponse<>(
+                        GenericResponse.Status.SUCCESS,
+                        "Task retrieved successfully",
+                        task.get()
+                );
+                return ResponseEntity.ok(response);
+            } else {
+                GenericResponse<Task> response = new GenericResponse<>(
+                        GenericResponse.Status.FAILED,
+                        "Task not found with ID: " + id,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (TaskManagerException e) {
+            GenericResponse<Task> response = new GenericResponse<>(
+                    GenericResponse.Status.FAILED,
+                    e.getMessage(),
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }
