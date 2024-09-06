@@ -5,7 +5,6 @@ import com.encora.taskmanager.model.GenericResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -103,7 +102,7 @@ public class TaskController {
     }
 
     @PostMapping("/tasks")
-    public ResponseEntity<GenericResponse<Task>> createTask(@Valid @RequestBody Task task) {
+    public ResponseEntity<GenericResponse<Task>> createTask(@RequestBody Task task) {
         try {
             Task createdTask = taskService.createTask(task);
             GenericResponse<Task> response = new GenericResponse<>(
