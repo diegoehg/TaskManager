@@ -1,19 +1,10 @@
 package com.encora.taskmanager.service;
 
 import com.encora.taskmanager.model.Task;
+import com.encora.taskmanager.model.TaskFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-import java.time.LocalDate;
-import java.util.List;
 
 public interface TaskService {
-    Page<Task> getAllTasks(Pageable pageable);
-
-    Page<Task> getTasksByStatusIn(List<Task.Status> statuses, Pageable pageable);
-
-    Page<Task> getTasksByDueDateRange(LocalDate dueDateAfter, LocalDate dueDateBefore, Pageable pageable);
-
-    Page<Task> getTasksSortedByDueDate(Pageable pageable, Sort.Direction sortDirection);
+    Page<Task> getAllTasks(TaskFilter taskFilter, Pageable pageable);
 }

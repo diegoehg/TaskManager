@@ -3,6 +3,7 @@ package com.encora.taskmanager.controller;
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.GenericResponse;
 import com.encora.taskmanager.model.Task;
+import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,19 +39,16 @@ public class TaskController {
     ) {
         try {
             Pageable pageable = Pageable.ofSize(size).withPage(page);
-            Page<Task> tasks;
+            Sort.Direction sortDirection = sort != null ? Sort.Direction.fromString(sort.toUpperCase()) : null;
 
-            if (status != null && !status.isEmpty()) {
-                List<Task.Status> statuses = convertToListStatus(status);
-                tasks = taskService.getTasksByStatusIn(statuses, pageable);
-            } else if (dueDateAfter != null || dueDateBefore != null) {
-                tasks = taskService.getTasksByDueDateRange(dueDateAfter, dueDateBefore, pageable);
-            } else if (sort != null) {
-                Sort.Direction sortDirection = Sort.Direction.fromString(sort.toUpperCase());
-                tasks = taskService.getTasksSortedByDueDate(pageable, sortDirection);
-            } else {
-                tasks = taskService.getAllTasks(pageable);
-            }
+            TaskFilter taskFilter = new TaskFilter(
+                    status != null ? convertToListStatus(status) : null,
+                    dueDateAfter,
+                    dueDateBefore,
+                    sortDirection
+            );
+
+            Page<Task> tasks = taskService.getAllTasks(taskFilter, pageable);
 
             GenericResponse<Page<Task>> response = new GenericResponse<>(
                     GenericResponse.Status.SUCCESS,
