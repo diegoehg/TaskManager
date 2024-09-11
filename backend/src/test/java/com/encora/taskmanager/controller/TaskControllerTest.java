@@ -333,4 +333,22 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.data.id").value(1L))
                 .andExpect(jsonPath("$.data.description").value("New Task"));
     }
+
+    @Test
+    public void shouldReturnBadRequestForMalformedRequestBody() throws Exception {
+        String invalidJson = """
+                        { 
+                            "description": "Invalid Task", 
+                            "dueDate": "invalid-date" 
+                        }
+                """;
+
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.message").value("Malformed task request body."));
+    }
 }

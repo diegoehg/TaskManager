@@ -204,6 +204,17 @@ POST /api/tasks
 
 ## Error Handling
 
+### Bad Request (400)
+If the request body is malformed, data cannot be parsed or it has missing required fields, the endpoint will return a
+JSON response with the following structure:
+```json
+{
+   "status": "FAILED",
+   "message": "Malformed task request body.",
+   "data": null
+}
+```
+
 ### Internal Server Error (500)
 If an internal server error occurs, the endpoint will return a JSON response with the following structure:
 ```json
