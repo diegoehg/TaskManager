@@ -135,7 +135,8 @@ This endpoint retrieves a specific task
 | --------- | ------ | -------- | --------------------  |
 | id        | long   | Yes      | The ID of the task to retrieve. |
 
-   Example Request: `GET /api/tasks/1`
+### Example Request
+`GET /api/tasks/1`
 
 ### Response Structure
 
@@ -261,6 +262,38 @@ PUT /api/tasks
    "status": "FAILED",
    "message": "Malformed task request body.",
    "data": null
+}
+```
+
+
+## DELETE `/api/tasks/:id`
+Delete a Task identified by the introduced ID.
+
+### Parameters
+| Parameter | Type | Required | Description |
+| --------- | ------ | -------- | ---------------------- |
+| id | long | Yes | The ID of the task to delete. |
+
+### Example Request
+`DELETE /api/tasks/1`
+
+### Response Structure
+
+#### (Success - 200 OK)
+```json
+{
+   "status": "SUCCESS",
+   "message": "Task deleted successfully",
+   "data": null
+}
+```
+
+#### (Not Found - 404)
+```json
+{
+  "status": "FAILED",
+  "message": "Task not found with ID: {id}",
+  "data": null
 }
 ```
 

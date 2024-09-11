@@ -117,6 +117,27 @@ public class TaskController {
         }
     }
 
+    @DeleteMapping("/tasks/{id}")
+    public ResponseEntity<GenericResponse<Void>> deleteTask(@PathVariable Long id) {
+        Optional<Task> existingTask = taskService.getTaskById(id);
+        if (existingTask.isPresent()) {
+            taskService.deleteTask(id);
+            GenericResponse<Void> response = new GenericResponse<>(
+                    GenericResponse.Status.SUCCESS,
+                    "Task deleted successfully",
+                    null
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            GenericResponse<Void> response = new GenericResponse<>(
+                    GenericResponse.Status.FAILED,
+                    "Task not found with ID: " + id,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
     @ExceptionHandler(TaskManagerException.class)
     public ResponseEntity<GenericResponse<Void>> handleTaskManagerExceptions(TaskManagerException ex) {
         GenericResponse<Void> response = new GenericResponse<>(

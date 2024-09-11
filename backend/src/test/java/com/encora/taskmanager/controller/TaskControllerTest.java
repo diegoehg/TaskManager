@@ -24,9 +24,7 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
@@ -404,5 +402,29 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("FAILED"))
                 .andExpect(jsonPath("$.message").value("Malformed task request body."));
+    }
+
+    @Test
+    public void shouldDeleteTask() throws Exception {
+        long taskId = 1L;
+        when(taskService.getTaskById(taskId)).thenReturn(Optional.of(new Task(taskId, "Task 1", LocalDate.now(), Task.Status.PENDING)));
+
+        mockMvc.perform(delete("/api/tasks/{id}", taskId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.message").value("Task deleted successfully"));
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenDeletingNonExistingTask() throws Exception {
+        long taskId = 999L;
+        when(taskService.getTaskById(taskId)).thenReturn(Optional.empty());
+
+        mockMvc.perform(delete("/api/tasks/{id}", taskId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.message").value("Task not found with ID: " + taskId));
     }
 }
