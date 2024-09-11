@@ -336,7 +336,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    public void shouldReturnBadRequestForMalformedRequestBody() throws Exception {
+    public void shouldReturnBadRequestForPostMalformedRequestBody() throws Exception {
         String invalidJson = """
                         { 
                             "description": "Invalid Task", 
@@ -361,7 +361,7 @@ public class TaskControllerTest {
         when(taskService.getTaskById(1L)).thenReturn(Optional.of(existingTask));
         when(taskService.updateTask(updatedTask)).thenReturn(updatedTask);
 
-        mockMvc.perform(put("/api/tasks")
+        mockMvc.perform(put("/api/tasks/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedTask)))
                 .andExpect(status().isOk())
@@ -379,7 +379,7 @@ public class TaskControllerTest {
 
         when(taskService.getTaskById(999L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(put("/api/tasks")
+        mockMvc.perform(put("/api/tasks/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedTask)))
                 .andExpect(status().isNotFound())
@@ -389,15 +389,20 @@ public class TaskControllerTest {
     }
 
     @Test
-    public void shouldReturnBadRequestWhenUpdatingTaskWithoutId() throws Exception {
-        Task updatedTask = new Task(null, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
+    public void shouldReturnBadRequestForMalformedPutRequestBody() throws Exception {
+        String invalidJson = """
+                        { 
+                            "description": "Invalid Task",
+                            "status": 34534534534
+                        }
+                """;
 
-        mockMvc.perform(put("/api/tasks")
+        mockMvc.perform(put("/api/tasks/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedTask)))
+                        .content(invalidJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("FAILED"))
-                .andExpect(jsonPath("$.message").value("Fields with invalid data introduced."));
+                .andExpect(jsonPath("$.message").value("Malformed task request body."));
     }
 }

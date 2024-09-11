@@ -202,13 +202,19 @@ POST /api/tasks
 ```
 
 
-## PUT `/api/tasks`
-Updates a Task with the details included in the request body. The response will include the recently updated task.
+## PUT `/api/tasks/:id`
+Updates an existing Task with the details included in the request body. The response will include the recently
+updated task.
+
+### Parameters
+| Parameter | Type   | Required | Description                            |
+| --------- | ------ | -------- | -------------------------------------- |
+| id        | long   | Yes      | The ID of the task to update.         |
 
 ### Request Body
+You can include `id` field although is going to be ignored.
 ```json
 {
-   "id": "long (required)",
    "description": "string",
    "dueDate": "date (YYYY-MM-DD)",
    "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
@@ -219,7 +225,6 @@ Updates a Task with the details included in the request body. The response will 
 ```
 PUT /api/tasks
 {
-   "id": 1,
    "description": "Finish project report (updated)",
    "dueDate": "2025-01-05",
    "status": "IN_PROGRESS"
@@ -254,7 +259,7 @@ PUT /api/tasks
 ```json
 {
    "status": "FAILED",
-   "message": "Task ID is required for update.",
+   "message": "Malformed task request body.",
    "data": null
 }
 ```

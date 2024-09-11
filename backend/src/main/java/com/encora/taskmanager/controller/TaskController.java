@@ -2,7 +2,6 @@ package com.encora.taskmanager.controller;
 
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.GenericResponse;
-import com.encora.taskmanager.model.PutTaskInfo;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
@@ -15,8 +14,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -99,8 +96,8 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/tasks")
-    public ResponseEntity<GenericResponse<Task>> updateTask(@Validated(PutTaskInfo.class) @RequestBody Task task) {
+    @PutMapping("/tasks/{id}")
+    public ResponseEntity<GenericResponse<Task>> updateTask(@PathVariable Long id, @Valid @RequestBody Task task) {
         Optional<Task> existingTask = taskService.getTaskById(task.id());
         if (existingTask.isPresent()) {
             Task updatedTask = taskService.updateTask(task);
@@ -135,16 +132,6 @@ public class TaskController {
         GenericResponse<Void> response = new GenericResponse<>(
                 GenericResponse.Status.FAILED,
                 "Malformed task request body.",
-                null
-        );
-        return ResponseEntity.badRequest().body(response);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GenericResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        GenericResponse<Void> response = new GenericResponse<>(
-                GenericResponse.Status.FAILED,
-                "Fields with invalid data introduced.",
                 null
         );
         return ResponseEntity.badRequest().body(response);
