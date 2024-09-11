@@ -36,34 +36,25 @@ public class TaskController {
             @RequestParam(value = "dueDateBefore", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueDateBefore,
             @RequestParam(value = "sort", required = false) String sort
     ) {
-        try {
-            Pageable pageable = Pageable.ofSize(size).withPage(page);
-            List<Task.Status> statuses = status != null ? convertToListStatus(status) : null;
-            Sort.Direction sortDirection = sort != null ? Sort.Direction.fromString(sort.toUpperCase()) : null;
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        List<Task.Status> statuses = status != null ? convertToListStatus(status) : null;
+        Sort.Direction sortDirection = sort != null ? Sort.Direction.fromString(sort.toUpperCase()) : null;
 
-            TaskFilter taskFilter = new TaskFilter(
-                    statuses,
-                    dueDateAfter,
-                    dueDateBefore,
-                    sortDirection
-            );
+        TaskFilter taskFilter = new TaskFilter(
+                statuses,
+                dueDateAfter,
+                dueDateBefore,
+                sortDirection
+        );
 
-            Page<Task> tasks = taskService.getAllTasks(taskFilter, pageable);
+        Page<Task> tasks = taskService.getAllTasks(taskFilter, pageable);
 
-            GenericResponse<Page<Task>> response = new GenericResponse<>(
-                    GenericResponse.Status.SUCCESS,
-                    "Tasks retrieved successfully",
-                    tasks
-            );
-            return ResponseEntity.ok(response);
-        } catch (TaskManagerException e) {
-            GenericResponse<Page<Task>> response = new GenericResponse<>(
-                    GenericResponse.Status.FAILED,
-                    e.getMessage(),
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        GenericResponse<Page<Task>> response = new GenericResponse<>(
+                GenericResponse.Status.SUCCESS,
+                "Tasks retrieved successfully",
+                tasks
+        );
+        return ResponseEntity.ok(response);
     }
 
     private List<Task.Status> convertToListStatus(String status) {
@@ -75,51 +66,43 @@ public class TaskController {
 
     @GetMapping("/tasks/{id}")
     public ResponseEntity<GenericResponse<Task>> getTaskById(@PathVariable Long id) {
-        try {
-            Optional<Task> task = taskService.getTaskById(id);
-            if (task.isPresent()) {
-                GenericResponse<Task> response = new GenericResponse<>(
-                        GenericResponse.Status.SUCCESS,
-                        "Task retrieved successfully",
-                        task.get()
-                );
-                return ResponseEntity.ok(response);
-            } else {
-                GenericResponse<Task> response = new GenericResponse<>(
-                        GenericResponse.Status.FAILED,
-                        "Task not found with ID: " + id,
-                        null
-                );
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-        } catch (TaskManagerException e) {
+        Optional<Task> task = taskService.getTaskById(id);
+        if (task.isPresent()) {
+            GenericResponse<Task> response = new GenericResponse<>(
+                    GenericResponse.Status.SUCCESS,
+                    "Task retrieved successfully",
+                    task.get()
+            );
+            return ResponseEntity.ok(response);
+        } else {
             GenericResponse<Task> response = new GenericResponse<>(
                     GenericResponse.Status.FAILED,
-                    e.getMessage(),
+                    "Task not found with ID: " + id,
                     null
             );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 
     @PostMapping("/tasks")
     public ResponseEntity<GenericResponse<Task>> createTask(@RequestBody Task task) {
-        try {
-            Task createdTask = taskService.createTask(task);
-            GenericResponse<Task> response = new GenericResponse<>(
-                    GenericResponse.Status.SUCCESS,
-                    "Task created successfully",
-                    createdTask
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (TaskManagerException e) {
-            GenericResponse<Task> response = new GenericResponse<>(
-                    GenericResponse.Status.FAILED,
-                    e.getMessage(),
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        Task createdTask = taskService.createTask(task);
+        GenericResponse<Task> response = new GenericResponse<>(
+                GenericResponse.Status.SUCCESS,
+                "Task created successfully",
+                createdTask
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @ExceptionHandler(TaskManagerException.class)
+    public ResponseEntity<GenericResponse<Void>> handleTaskManagerExceptions(TaskManagerException ex) {
+        GenericResponse<Void> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                ex.getMessage(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
