@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
@@ -350,5 +351,53 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("FAILED"))
                 .andExpect(jsonPath("$.message").value("Malformed task request body."));
+    }
+
+    @Test
+    public void shouldUpdateTask() throws Exception {
+        Task existingTask = new Task(1L, "Existing Task", LocalDate.of(2024, 12, 25), Task.Status.PENDING);
+        Task updatedTask = new Task(1L, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
+
+        when(taskService.getTaskById(1L)).thenReturn(Optional.of(existingTask));
+        when(taskService.updateTask(updatedTask)).thenReturn(updatedTask);
+
+        mockMvc.perform(put("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedTask)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.data.id").value(1L))
+                .andExpect(jsonPath("$.data.description").value("Updated Task"))
+                .andExpect(jsonPath("$.data.dueDate").value("2025-01-01"))
+                .andExpect(jsonPath("$.data.status").value("IN_PROGRESS"));
+    }
+
+    @Test
+    public void shouldReturnNotFoundWhenUpdatingNonExistingTask() throws Exception {
+        Task updatedTask = new Task(999L, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
+
+        when(taskService.getTaskById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedTask)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.message").value("Task not found with ID: 999"));
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenUpdatingTaskWithoutId() throws Exception {
+        Task updatedTask = new Task(null, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
+
+        mockMvc.perform(put("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedTask)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.message").value("Task ID is required for update."));
     }
 }

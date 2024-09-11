@@ -95,6 +95,36 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PutMapping("/tasks")
+    public ResponseEntity<GenericResponse<Task>> updateTask(@RequestBody Task task) {
+        if (task.id() == null) {
+            GenericResponse<Task> response = new GenericResponse<>(
+                    GenericResponse.Status.FAILED,
+                    "Task ID is required for update.",
+                    null
+            );
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Optional<Task> existingTask = taskService.getTaskById(task.id());
+        if (existingTask.isPresent()) {
+            Task updatedTask = taskService.updateTask(task);
+            GenericResponse<Task> response = new GenericResponse<>(
+                    GenericResponse.Status.SUCCESS,
+                    "Task updated successfully",
+                    updatedTask
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            GenericResponse<Task> response = new GenericResponse<>(
+                    GenericResponse.Status.FAILED,
+                    "Task not found with ID: " + task.id(),
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
     @ExceptionHandler(TaskManagerException.class)
     public ResponseEntity<GenericResponse<Void>> handleTaskManagerExceptions(TaskManagerException ex) {
         GenericResponse<Void> response = new GenericResponse<>(

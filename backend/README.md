@@ -162,7 +162,7 @@ This endpoint retrieves a specific task
 }
 ```
 
-## POST /api/tasks
+## POST `/api/tasks`
 Creates a New Task with the details provided in the request body. The response will include the newly created task with 
 its generated ID.
 
@@ -198,6 +198,64 @@ POST /api/tasks
     "dueDate": "date",
     "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
   }
+}
+```
+
+
+## PUT `/api/tasks`
+Updates a Task with the details included in the request body. The response will include the recently updated task.
+
+### Request Body
+```json
+{
+   "id": "long (required)",
+   "description": "string",
+   "dueDate": "date (YYYY-MM-DD)",
+   "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
+}
+```
+
+### Example Request
+```
+PUT /api/tasks
+{
+   "id": 1,
+   "description": "Finish project report (updated)",
+   "dueDate": "2025-01-05",
+   "status": "IN_PROGRESS"
+}
+```
+
+### Response Structure
+
+#### (Success - 200 OK)
+```json
+{
+  "status": "SUCCESS",
+  "message": "Task updated successfully",
+  "data": {
+  "id": "long",
+  "description": "string",
+  "dueDate": "date",
+  "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
+}
+```
+
+#### (Not Found - 404)
+```json
+{
+   "status": "FAILED",
+   "message": "Task not found with ID: {id}",
+   "data": null
+}
+```
+
+#### (Bad Request - 400)
+```json
+{
+   "status": "FAILED",
+   "message": "Task ID is required for update.",
+   "data": null
 }
 ```
 

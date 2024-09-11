@@ -13,4 +13,6 @@ public interface TaskService {
     Optional<Task> getTaskById(Long id);
 
     Task createTask(Task task);
+
+    Task updateTask(Task task);
 }
