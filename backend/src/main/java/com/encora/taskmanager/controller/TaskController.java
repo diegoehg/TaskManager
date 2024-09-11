@@ -2,9 +2,11 @@ package com.encora.taskmanager.controller;
 
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.GenericResponse;
+import com.encora.taskmanager.model.PutTaskInfo;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -85,7 +89,7 @@ public class TaskController {
     }
 
     @PostMapping("/tasks")
-    public ResponseEntity<GenericResponse<Task>> createTask(@RequestBody Task task) {
+    public ResponseEntity<GenericResponse<Task>> createTask(@Valid @RequestBody Task task) {
         Task createdTask = taskService.createTask(task);
         GenericResponse<Task> response = new GenericResponse<>(
                 GenericResponse.Status.SUCCESS,
@@ -96,16 +100,7 @@ public class TaskController {
     }
 
     @PutMapping("/tasks")
-    public ResponseEntity<GenericResponse<Task>> updateTask(@RequestBody Task task) {
-        if (task.id() == null) {
-            GenericResponse<Task> response = new GenericResponse<>(
-                    GenericResponse.Status.FAILED,
-                    "Task ID is required for update.",
-                    null
-            );
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public ResponseEntity<GenericResponse<Task>> updateTask(@Validated(PutTaskInfo.class) @RequestBody Task task) {
         Optional<Task> existingTask = taskService.getTaskById(task.id());
         if (existingTask.isPresent()) {
             Task updatedTask = taskService.updateTask(task);
@@ -140,6 +135,16 @@ public class TaskController {
         GenericResponse<Void> response = new GenericResponse<>(
                 GenericResponse.Status.FAILED,
                 "Malformed task request body.",
+                null
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<GenericResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        GenericResponse<Void> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                "Fields with invalid data introduced.",
                 null
         );
         return ResponseEntity.badRequest().body(response);

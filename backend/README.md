@@ -268,6 +268,14 @@ JSON response with the following structure:
 ```json
 {
    "status": "FAILED",
+   "message": "string",
+   "data": null
+}
+```
+
+```json
+{
+   "status": "FAILED",
    "message": "Malformed task request body.",
    "data": null
 }

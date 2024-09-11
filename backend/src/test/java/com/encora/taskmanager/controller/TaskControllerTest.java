@@ -398,6 +398,6 @@ public class TaskControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("FAILED"))
-                .andExpect(jsonPath("$.message").value("Task ID is required for update."));
+                .andExpect(jsonPath("$.message").value("Fields with invalid data introduced."));
     }
 }
