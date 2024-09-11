@@ -373,17 +373,18 @@ public class TaskControllerTest {
 
     @Test
     public void shouldReturnNotFoundWhenUpdatingNonExistingTask() throws Exception {
-        Task updatedTask = new Task(999L, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
+        Long taskId = 999L;
+        Task updatedTask = new Task(taskId, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
 
-        when(taskService.getTaskById(999L)).thenReturn(Optional.empty());
+        when(taskService.getTaskById(taskId)).thenReturn(Optional.empty());
 
-        mockMvc.perform(put("/api/tasks/{id}", 1L)
+        mockMvc.perform(put("/api/tasks/{id}", taskId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedTask)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("FAILED"))
-                .andExpect(jsonPath("$.message").value("Task not found with ID: 999"));
+                .andExpect(jsonPath("$.message").value("Task not found with ID: " + taskId));
     }
 
     @Test

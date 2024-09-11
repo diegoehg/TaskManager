@@ -76,12 +76,7 @@ public class TaskController {
             );
             return ResponseEntity.ok(response);
         } else {
-            GenericResponse<Task> response = new GenericResponse<>(
-                    GenericResponse.Status.FAILED,
-                    "Task not found with ID: " + id,
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return handleTaskNotFound(id, Task.class);
         }
     }
 
@@ -108,12 +103,7 @@ public class TaskController {
             );
             return ResponseEntity.ok(response);
         } else {
-            GenericResponse<Task> response = new GenericResponse<>(
-                    GenericResponse.Status.FAILED,
-                    "Task not found with ID: " + task.id(),
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return handleTaskNotFound(id, Task.class);
         }
     }
 
@@ -129,13 +119,17 @@ public class TaskController {
             );
             return ResponseEntity.ok(response);
         } else {
-            GenericResponse<Void> response = new GenericResponse<>(
-                    GenericResponse.Status.FAILED,
-                    "Task not found with ID: " + id,
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return handleTaskNotFound(id, Void.class);
         }
+    }
+
+    private <T> ResponseEntity<GenericResponse<T>> handleTaskNotFound(Long id, Class<T> type) {
+        GenericResponse<T> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                "Task not found with ID: " + id,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(TaskManagerException.class)
