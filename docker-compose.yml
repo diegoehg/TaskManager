@@ -1,4 +1,17 @@
 services:
+  mongodb:
+    image: mongo:7.0.14
+    container_name: task-manager-mongodb
+    restart: always
+    ports:
+      - "27017:27017"  # Map host port 27017 to container port 27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: task-manager-db
+    volumes:
+      - mongodb-data:/data/db
+
   backend:
     build:
       context: ./backend  # Path to the backend Dockerfile
@@ -16,3 +29,6 @@ services:
       - "3000:3000"  # Map host port 3000 to container port 3000
     depends_on:
       - backend  # Start the backend service before the frontend service
+
+volumes:
+  mongodb-data:
