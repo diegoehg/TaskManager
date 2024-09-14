@@ -24,12 +24,16 @@ public class TaskServiceImpl implements TaskService {
         // Add logic for filtering, sorting, and pagination based on taskFilter
         // For simplicity, returning all tasks for now
         List<Task> tasks = taskRepository.findAll().stream()
-                .filter(task -> taskFilter.statuses() == null || taskFilter.statuses().isEmpty() || taskFilter.statuses().contains(task.status()))
+                .filter(task -> filterTaskByStatus(task, taskFilter))
                 .skip(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .collect(Collectors.toList());
 
         return new PageImpl<>(tasks, pageable, tasks.size());
+    }
+
+    private boolean filterTaskByStatus(Task task, TaskFilter taskFilter) {
+        return taskFilter.statuses() == null || taskFilter.statuses().isEmpty() || taskFilter.statuses().contains(task.status());
     }
 
     @Override
