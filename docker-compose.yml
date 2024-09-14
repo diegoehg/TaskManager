@@ -20,7 +20,7 @@ services:
     ports:
       - "9090:9090"  # Map host port 9090 to container port 9090
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:example@mongodb:27017/task-manager-db
+      SPRING_DATA_MONGODB_URI: mongodb://taskManagerUser:TaskUser847584@mongodb:27017/task-manager-db?authSource=admin
 
   frontend:
     build:
