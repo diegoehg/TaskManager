@@ -19,6 +19,8 @@ services:
     container_name: task-manager-backend
     ports:
       - "9090:9090"  # Map host port 9090 to container port 9090
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:example@mongodb:27017/task-manager-db
 
   frontend:
     build:
