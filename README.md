@@ -20,6 +20,8 @@ cd backend/
 docker build -t task-manager-backend:latest .
 ```
 
+These steps are included in the Dockerfile.
+
 ## Frontend
 The frontend consists of a Dockerized React application. This application uses parcel for building and running
 the app. The following commands are needed:
