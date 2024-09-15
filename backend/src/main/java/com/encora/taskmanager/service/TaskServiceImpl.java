@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ public class TaskServiceImpl implements TaskService {
                 .filter(task -> filterTaskByStatus(task, taskFilter))
                 .filter(task -> filterByDueDateAfter(task, taskFilter))
                 .filter(task -> filterByDueDateBefore(task, taskFilter))
+                .sorted(getTaskComparator(taskFilter))
                 .skip(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .collect(Collectors.toList());
@@ -47,6 +50,20 @@ public class TaskServiceImpl implements TaskService {
     private boolean filterByDueDateBefore(Task task, TaskFilter taskFilter) {
         return taskFilter.dueDateAfter() == null || task.dueDate().isBefore(taskFilter.dueDateBefore()) ||
                 task.dueDate().isEqual(taskFilter.dueDateBefore());
+    }
+
+    private Comparator<Task> getTaskComparator(TaskFilter taskFilter) {
+        if (taskFilter.sortDirection() == null) {
+            return Comparator.comparing(Task::id);
+        }
+
+        Comparator<Task> dueDateComparator = Comparator.comparing(Task::dueDate);
+
+        if (taskFilter.sortDirection().equals(Sort.Direction.ASC)) {
+            return dueDateComparator;
+        }
+
+        return dueDateComparator.reversed();
     }
 
     @Override

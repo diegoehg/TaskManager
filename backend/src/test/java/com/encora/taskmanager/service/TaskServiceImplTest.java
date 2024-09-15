@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -72,5 +73,35 @@ public class TaskServiceImplTest {
         assertEquals(4, result.getTotalElements());
         assertEquals(2, result.getContent().size());
         assertEquals(List.of(task5, task6), result.getContent());
+    }
+
+    @Test
+    public void testGetAllTasksWithSortAscending() {
+        Task task1 = new Task(1L, "Task 1", LocalDate.of(2024, 12, 25), Task.Status.PENDING);
+        Task task2 = new Task(2L, "Task 2", LocalDate.of(2024, 12, 20), Task.Status.IN_PROGRESS);
+        Task task3 = new Task(3L, "Task 3", LocalDate.of(2024, 12, 30), Task.Status.COMPLETED);
+
+        when(taskRepository.findAll()).thenReturn(List.of(task1, task2, task3));
+
+        TaskFilter taskFilter = new TaskFilter(null, null, null, Sort.Direction.ASC);
+        Page<Task> result = taskService.getAllTasks(taskFilter, PageRequest.of(0, 10));
+
+        assertEquals(3, result.getTotalElements());
+        assertEquals(List.of(task2, task1, task3), result.getContent());
+    }
+
+    @Test
+    public void testGetAllTasksWithSortDescending() {
+        Task task1 = new Task(1L, "Task 1", LocalDate.of(2024, 12, 25), Task.Status.PENDING);
+        Task task2 = new Task(2L, "Task 2", LocalDate.of(2024, 12, 20), Task.Status.IN_PROGRESS);
+        Task task3 = new Task(3L, "Task 3", LocalDate.of(2024, 12, 30), Task.Status.COMPLETED);
+
+        when(taskRepository.findAll()).thenReturn(List.of(task1, task2, task3));
+
+        TaskFilter taskFilter = new TaskFilter(null, null, null, Sort.Direction.DESC);
+        Page<Task> result = taskService.getAllTasks(taskFilter, PageRequest.of(0, 10));
+
+        assertEquals(3, result.getTotalElements());
+        assertEquals(List.of(task3, task1, task2), result.getContent());
     }
 }
