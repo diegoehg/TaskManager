@@ -25,6 +25,8 @@ public class TaskServiceImpl implements TaskService {
         // For simplicity, returning all tasks for now
         List<Task> tasks = taskRepository.findAll().stream()
                 .filter(task -> filterTaskByStatus(task, taskFilter))
+                .filter(task -> filterByDueDateAfter(task, taskFilter))
+                .filter(task -> filterByDueDateBefore(task, taskFilter))
                 .skip(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .collect(Collectors.toList());
@@ -33,7 +35,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private boolean filterTaskByStatus(Task task, TaskFilter taskFilter) {
-        return taskFilter.statuses() == null || taskFilter.statuses().isEmpty() || taskFilter.statuses().contains(task.status());
+        return taskFilter.statuses() == null || taskFilter.statuses().isEmpty() ||
+                taskFilter.statuses().contains(task.status());
+    }
+
+    private boolean filterByDueDateAfter(Task task, TaskFilter taskFilter) {
+        return taskFilter.dueDateBefore() == null || task.dueDate().isAfter(taskFilter.dueDateAfter()) ||
+                task.dueDate().isEqual(taskFilter.dueDateAfter());
+    }
+
+    private boolean filterByDueDateBefore(Task task, TaskFilter taskFilter) {
+        return taskFilter.dueDateAfter() == null || task.dueDate().isBefore(taskFilter.dueDateBefore()) ||
+                task.dueDate().isEqual(taskFilter.dueDateBefore());
     }
 
     @Override

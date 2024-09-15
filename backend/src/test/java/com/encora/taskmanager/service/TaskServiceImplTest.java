@@ -49,4 +49,28 @@ public class TaskServiceImplTest {
         assertEquals(2, result.getTotalElements());
         assertEquals(List.of(task1, task2), result.getContent());
     }
+
+    @Test
+    public void testGetAllTasksWithDueDateFilter() {
+        // Sample data
+        Task task1 = new Task(1L, "Task 1", LocalDate.of(2024, 12, 20), Task.Status.PENDING);
+        Task task2 = new Task(2L, "Task 2", LocalDate.of(2024, 12, 25), Task.Status.IN_PROGRESS);
+        Task task3 = new Task(3L, "Task 3", LocalDate.of(2024, 12, 30), Task.Status.COMPLETED);
+        Task task4 = new Task(4L, "Task 4", LocalDate.of(2024, 12, 12), Task.Status.COMPLETED);
+        Task task5 = new Task(5L, "Task 5", LocalDate.of(2024, 12, 18), Task.Status.IN_PROGRESS);
+        Task task6 = new Task(6L, "Task 6", LocalDate.of(2024, 12, 29), Task.Status.COMPLETED);
+
+
+        when(taskRepository.findAll()).thenReturn(List.of(task1, task2, task3, task4, task5, task6));
+
+        // Test filtering by due date
+        LocalDate dueDateAfter = LocalDate.of(2024, 12, 17);
+        LocalDate dueDateBefore = LocalDate.of(2024, 12, 29);
+        TaskFilter taskFilter = new TaskFilter(null, dueDateAfter, dueDateBefore, null);
+        Page<Task> result = taskService.getAllTasks(taskFilter, PageRequest.of(1, 2));
+
+        assertEquals(4, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
+        assertEquals(List.of(task5, task6), result.getContent());
+    }
 }
