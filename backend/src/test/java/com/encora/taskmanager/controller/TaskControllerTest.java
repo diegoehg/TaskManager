@@ -67,7 +67,7 @@ public class TaskControllerTest {
     @Test
     public void shouldReturn500WhenServiceThrowsTaskManagerException() throws Exception {
         when(taskService.getAllTasks(any(TaskFilter.class), any(Pageable.class)))
-                .thenThrow(new TaskManagerException("Error retrieving tasks"));
+                .thenThrow(new TaskManagerException("Error retrieving tasks", new Exception("Exception")));
 
         mockMvc.perform(get("/api/tasks")
                         .accept(MediaType.APPLICATION_JSON))
