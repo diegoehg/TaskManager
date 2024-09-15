@@ -1,5 +1,55 @@
 # TaskManager Backend API Documentation
 
+## POST `/api/auth/signup`
+This endpoint receives a new user credentials and it creates it.
+
+### Request Body Structure
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+#### Example Request
+```
+POST /api/auth/signup
+{
+  "email": "john-doe@example.com",
+  "password": "S0m3&Ex4mpl3"
+}
+```
+
+
+### Response Structure
+The response will have the following structure:
+```json
+{
+  "status": "SUCCESS" | "FAILED",
+  "message": "string",
+  "data": null
+}
+```
+
+#### (Success - 201 Created):
+```json
+{
+  "status": "SUCCESS",
+  "message": "User registered successfully!",
+  "data": null
+}
+```
+
+#### (Invalid Data - 400 Bad Request):
+```json
+{
+  "status": "FAILED",
+  "message": "Invalid password. It must meet the following criteria: At least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.",
+  "data": null
+}
+```
+
+
 ## GET `/api/tasks`
 This endpoint retrieves a list of tasks. It supports pagination and filtering by status.
 
@@ -176,7 +226,7 @@ its generated ID.
 }
 ```
 
-### Example Request
+#### Example Request
 ```
 POST /api/tasks
 {
@@ -222,7 +272,7 @@ You can include `id` field although is going to be ignored.
 }
 ```
 
-### Example Request
+#### Example Request
 ```
 PUT /api/tasks
 {
