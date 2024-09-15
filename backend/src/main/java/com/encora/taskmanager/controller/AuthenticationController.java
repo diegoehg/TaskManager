@@ -2,12 +2,11 @@ package com.encora.taskmanager.controller;
 
 import com.encora.taskmanager.model.AuthenticationCredentialsRequest;
 import com.encora.taskmanager.model.GenericResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.regex.Pattern;
 
@@ -19,7 +18,7 @@ public class AuthenticationController {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
 
     @PostMapping("/signup")
-    public ResponseEntity<GenericResponse<Void>> signup(@RequestBody AuthenticationCredentialsRequest request) {
+    public ResponseEntity<GenericResponse<Void>> signup(@Valid @RequestBody AuthenticationCredentialsRequest request) {
         if (!isValidPassword(request.password())) {
             GenericResponse<Void> response = new GenericResponse<>(
                     GenericResponse.Status.FAILED,
@@ -41,5 +40,15 @@ public class AuthenticationController {
 
     private boolean isValidPassword(String password) {
         return PASSWORD_PATTERN.matcher(password).matches();
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<GenericResponse<Void>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        GenericResponse<Void> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                ex.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+                null
+        );
+        return ResponseEntity.badRequest().body(response);
     }
 }
