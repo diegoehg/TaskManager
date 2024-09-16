@@ -115,4 +115,27 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
                 .andExpect(jsonPath("$.message").value("Authentication not authorized"));
     }
+
+    @Test
+    public void testLogout_ValidJwt_ReturnsOk() throws Exception {
+        String username = "user@example.com";
+        String jwtToken = "valid-jwt-token " + username; // Replace with actual token generation
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value("Logout successful"));
+    }
+
+    @Test
+    public void testLogout_InvalidJwt_ReturnsUnauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer invalid-jwt-token"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
+                .andExpect(jsonPath("$.message").value("Invalid or missing JWT token"));
+    }
 }

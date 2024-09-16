@@ -116,6 +116,44 @@ This endpoint allows users to authenticate with the system by providing their cr
 ```
 
 
+## POST /api/auth/logout
+This endpoint allows users to log out of the system, invalidating their current session.
+
+### Request Structure
+The request should include a valid JWT token in the Authorization header, using the Bearer scheme. For example:
+```
+Authorization: Bearer your-jwt-token
+```
+
+### Response Structure
+```json
+{
+  "status": "SUCCESS" | "FAILED",
+  "message": "string",
+  "data": null
+}
+```
+
+#### Succesful Logout:
+```json
+{
+  "status": "SUCCESS",
+  "message": "Logout successful",
+  "data": null
+}
+```
+
+
+#### Failed Logout (401 Unauthorized):
+```json
+{
+  "status": "FAILED",
+  "message": "Invalid or missing JWT token",
+  "data": null
+}
+```
+
+
 ## GET `/api/tasks`
 This endpoint retrieves a list of tasks. It supports pagination and filtering by status.
 

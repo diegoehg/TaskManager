@@ -3,6 +3,7 @@ package com.encora.taskmanager.controller;
 import com.encora.taskmanager.model.AuthenticationCredentialsRequest;
 import com.encora.taskmanager.model.GenericResponse;
 import com.encora.taskmanager.model.LoginResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,7 @@ public class AuthenticationController {
 
         // TODO: Replace with actual user authentication logic against a database
         if (username.equals("user@example.com") && password.equals("Password123!")) {
+            // TODO Implement session management - login
             // Successful authentication
             String accessToken = generateJwtToken(username); // Implement JWT token generation
             String refreshToken = generateRefreshToken(); // Implement refresh token generation
@@ -61,6 +63,20 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<GenericResponse<Void>> logout(HttpServletRequest request) {
+        String username = extractUsernameFromJwt(request); // Implement JWT extraction logic
+        if (username != null) {
+            // TODO Implement session management - logout
+            invalidLoginAttempts.remove(username);
+            GenericResponse<Void> response = new GenericResponse<>(GenericResponse.Status.SUCCESS, "Logout successful", null);
+            return ResponseEntity.ok(response);
+        } else {
+            GenericResponse<Void> response = new GenericResponse<>(GenericResponse.Status.FAILED, "Invalid or missing JWT token", null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
+
     // TODO: Implement these methods for JWT and refresh token generation
     private String generateJwtToken(String username) {
         return "generated-jwt-token";
@@ -68,6 +84,22 @@ public class AuthenticationController {
 
     private String generateRefreshToken() {
         return "generated-refresh-token";
+    }
+
+    // TODO: Implement this method for JWT extraction
+    private String extractUsernameFromJwt(HttpServletRequest request) {
+        // Logic to extract username from JWT token in the request header
+        // For example, using Spring Security:
+        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+        //     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        //     return userDetails.getUsername();
+        // }
+        String jwt = request.getHeader("Authorization").substring(7);
+        if (jwt.endsWith("user@example.com"))
+            return jwt.substring(16);
+        else
+            return null;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
