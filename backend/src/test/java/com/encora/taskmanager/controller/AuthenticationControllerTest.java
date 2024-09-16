@@ -33,13 +33,15 @@ public class AuthenticationControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @Test
-    public void testSignup_InvalidPassword_ThrowsException() throws Exception {
-        AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("test@example.com", "password");
+    @ParameterizedTest
+    @ValueSource(strings = {"Sh0rt$", "n0_upperc4s3", "N0%L0W3RC4S3", "No_Number_Password", "N0Sp3cialCh4racter"})
+    public void testSignup_InvalidPassword_ThrowsException(String invalidPassword) throws Exception {
+        AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("test@example.com", invalidPassword);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()));
     }
 
     @ParameterizedTest
