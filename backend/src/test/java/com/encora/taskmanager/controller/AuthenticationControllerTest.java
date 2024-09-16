@@ -5,12 +5,16 @@ import com.encora.taskmanager.model.GenericResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,5 +58,61 @@ public class AuthenticationControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()));
+    }
+
+    @Test
+    public void testLogin_ValidCredentials_ReturnsOk() throws Exception {
+        AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("user@example.com", "Password123!");
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value("Authentication successful"))
+                .andExpect(jsonPath("$.data.access_token").value("generated-jwt-token"))
+                .andExpect(jsonPath("$.data.token_type").value("Bearer"))
+                .andExpect(jsonPath("$.data.expires_in").value(3600))
+                .andExpect(jsonPath("data.refresh_token").value("generated-refresh-token"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("parametersFor_testLogin_InvalidCredentials_ReturnsUnauthorized")
+    public void testLogin_InvalidCredentials_ReturnsUnauthorized(AuthenticationCredentialsRequest invalidCredential) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidCredential)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
+                .andExpect(jsonPath("$.message").value("Authentication not authorized"));
+    }
+
+    private static Stream<Arguments> parametersFor_testLogin_InvalidCredentials_ReturnsUnauthorized() {
+        return Stream.of(
+                Arguments.of(new AuthenticationCredentialsRequest("invalid@email.com", "Password123!")),
+                Arguments.of(new AuthenticationCredentialsRequest("user@example.com", "wrongPassword123!"))
+
+        );
+    }
+
+    @Test
+    public void testLogin_TooManyInvalidAttempts_ReturnsUnauthorized() throws Exception {
+        AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("user@example.com", "wrongPassword123!");
+
+        // Perform multiple invalid login attempts
+        for (int i = 0; i < AuthenticationController.MAX_INVALID_ATTEMPTS; i++) {
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()));
+        }
+
+        // Attempt to log in again (should be blocked)
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
+                .andExpect(jsonPath("$.message").value("Authentication not authorized"));
     }
 }

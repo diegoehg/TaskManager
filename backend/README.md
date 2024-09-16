@@ -50,6 +50,72 @@ The response will have the following structure:
 ```
 
 
+## POST /api/auth/login
+This endpoint allows users to authenticate with the system by providing their credentials.
+
+### Request Structure
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+#### Example Request
+```json
+{
+  "email": "john-doe@example.com",
+  "password": "S0m3&Ex4mpl3"
+}
+```
+
+### Response Structure
+```json
+{
+    "status": "SUCCESS",
+    "message": "string",
+    "data": {
+        "access_token":"JWT_TOKEN",
+        "token_type":"Bearer",
+        "expires_in":3600,
+        "refresh_token":"refresh_token"
+    }
+}
+```
+
+#### (Success - 200 OK):
+```json
+{
+    "status": "SUCCESS",
+    "message": "Authentication successful",
+    "data": {
+        "access_token":"JWT_TOKEN",
+        "token_type":"Bearer",
+        "expires_in":3600,
+        "refresh_token":"refresh_token"
+    }
+}
+```
+
+#### Failed Authentication (401 Unathorized):
+```json
+{
+  "status": "FAILED",
+  "message": "Authentication not authorized",
+  "data": null
+}
+```
+
+#### Error Response (400 Bad Request):
+```json
+{
+  "status": "FAILED",
+  "message": "string",
+  "data": null
+}
+```
+
+
 ## GET `/api/tasks`
 This endpoint retrieves a list of tasks. It supports pagination and filtering by status.
 
