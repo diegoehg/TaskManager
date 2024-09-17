@@ -1,5 +1,6 @@
 package com.encora.taskmanager.service;
 
+import com.encora.taskmanager.exception.AccountLockedException;
 import com.encora.taskmanager.exception.InvalidCredentialsException;
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.User;
@@ -67,7 +68,7 @@ public class UserAccountServiceImpl implements UserAccountService {
                 .orElseThrow(() -> new InvalidCredentialsException("No user found with those credentials"));
 
         if (isUserAccountLocked(userAccount)) {
-            throw new TaskManagerException("Account locked. Please try again 15 minutes later.", null);
+            throw new AccountLockedException("Account locked. Please try again 15 minutes later.");
         }
 
         if (userAccount.getPassword().equals(password)) {

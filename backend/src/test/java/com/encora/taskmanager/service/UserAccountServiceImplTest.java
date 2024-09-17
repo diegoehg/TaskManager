@@ -1,5 +1,6 @@
 package com.encora.taskmanager.service;
 
+import com.encora.taskmanager.exception.AccountLockedException;
 import com.encora.taskmanager.exception.InvalidCredentialsException;
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.User;
@@ -91,7 +92,7 @@ public class UserAccountServiceImplTest {
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
 
-        Exception exception = assertThrows(TaskManagerException.class, () ->
+        Exception exception = assertThrows(AccountLockedException.class, () ->
                 userAccountService.validateUserAccount("testuser", "password")
         );
         assertEquals("Account locked. Please try again 15 minutes later.", exception.getMessage());
