@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserAccountServiceImpl implements UserAccountService {
@@ -38,6 +39,18 @@ public class UserAccountServiceImpl implements UserAccountService {
             throw new TaskManagerException("Error registering user", e);
         }
     }
+
+    @Override
+    public Optional<UserAccount> findByUsername(String username) {
+        try {
+            return userAccountRepository.findByUsername(username);
+        }
+        catch (Exception e) {
+            LOGGER.error("Error retrieving user with username: {}", username, e);
+            throw new TaskManagerException("Error retrieving user", e);
+        }
+    }
+
 
     @Override
     public User validateUserAccount(String username, String password) {
