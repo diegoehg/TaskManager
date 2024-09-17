@@ -41,25 +41,20 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public User validateUserAccount(String username, String password) {
-        try {
-            UserAccount userAccount = userAccountRepository.findByUsername(username)
-                    .orElseThrow(() -> new TaskManagerException("Invalid username or password", null));
+        UserAccount userAccount = userAccountRepository.findByUsername(username)
+                .orElseThrow(() -> new TaskManagerException("Invalid username or password", null));
 
-            if (isUserAccountLocked(userAccount)) {
-                throw new TaskManagerException("Account locked. Please try again 15 minutes later.", null);
-            }
+        if (isUserAccountLocked(userAccount)) {
+            throw new TaskManagerException("Account locked. Please try again 15 minutes later.", null);
+        }
 
-            if (userAccount.getPassword().equals(password)) {
-                resetFailedLoginAttempts(userAccount);
-                return userRepository.findById(userAccount.getUserId())
-                        .orElseThrow(() -> new TaskManagerException("No user found with those credentials", null));
-            } else {
-                handleFailedLoginAttempt(userAccount);
-                throw new TaskManagerException("Invalid username or password", null);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error validating user account: {}", username, e);
-            throw new TaskManagerException("Error validating user account", e);
+        if (userAccount.getPassword().equals(password)) {
+            resetFailedLoginAttempts(userAccount);
+            return userRepository.findById(userAccount.getUserId())
+                    .orElseThrow(() -> new TaskManagerException("No user found with those credentials", null));
+        } else {
+            handleFailedLoginAttempt(userAccount);
+            throw new TaskManagerException("Invalid username or password", null);
         }
     }
 
