@@ -10,5 +10,7 @@ public interface UserAccountService {
 
     Optional<UserAccount> findByUsername(String username);
 
+    UserAccount saveUserAccount(UserAccount userAccount);
+
     User validateUserAccount(String username, String password);
 }

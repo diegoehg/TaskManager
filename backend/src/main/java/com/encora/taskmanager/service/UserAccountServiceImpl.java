@@ -44,13 +44,21 @@ public class UserAccountServiceImpl implements UserAccountService {
     public Optional<UserAccount> findByUsername(String username) {
         try {
             return userAccountRepository.findByUsername(username);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("Error retrieving user with username: {}", username, e);
             throw new TaskManagerException("Error retrieving user", e);
         }
     }
 
+    @Override
+    public UserAccount saveUserAccount(UserAccount userAccount) {
+        try {
+            return userAccountRepository.save(userAccount);
+        } catch (Exception e) {
+            LOGGER.error("Error saving user account: {}", userAccount, e);
+            throw new TaskManagerException("Error saving user account", e);
+        }
+    }
 
     @Override
     public User validateUserAccount(String username, String password) {
