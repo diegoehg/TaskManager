@@ -2,6 +2,9 @@ package com.encora.taskmanager.controller;
 
 import com.encora.taskmanager.model.AuthenticationCredentialsRequest;
 import com.encora.taskmanager.model.GenericResponse;
+import com.encora.taskmanager.model.User;
+import com.encora.taskmanager.model.UserAccount;
+import com.encora.taskmanager.service.UserAccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,12 +13,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.stream.Stream;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,12 +30,20 @@ public class AuthenticationControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private UserAccountService userAccountService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
     public void testSignup_ValidPassword_ReturnsCreated() throws Exception {
         AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("test@example.com", "Password123!");
+        User user = new User(1L, request.username());
+
+        when(userAccountService.registerUser(new UserAccount(null, request.username(), request.password(), null, 0, null)))
+                .thenReturn(user);
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

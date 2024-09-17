@@ -1,10 +1,10 @@
 package com.encora.taskmanager.controller;
 
-import com.encora.taskmanager.model.AuthenticationCredentialsRequest;
-import com.encora.taskmanager.model.GenericResponse;
-import com.encora.taskmanager.model.LoginResponse;
+import com.encora.taskmanager.model.*;
+import com.encora.taskmanager.service.UserAccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,9 +21,13 @@ public class AuthenticationController {
     public static final int MAX_INVALID_ATTEMPTS = 3;
     private static final long JWT_EXPIRATION_TIME = 3600;
 
+    @Autowired
+    private UserAccountService userAccountService;
+
     @PostMapping("/signup")
     public ResponseEntity<GenericResponse<Void>> signup(@Valid @RequestBody AuthenticationCredentialsRequest request) {
-        // TODO: Implement user registration logic (e.g., save user to database)
+        userAccountService.registerUser(new UserAccount(null, request.username(), request.password(), null, 0, null));
+
         GenericResponse<Void> response = new GenericResponse<>(
                 GenericResponse.Status.SUCCESS,
                 "User registered successfully!",
