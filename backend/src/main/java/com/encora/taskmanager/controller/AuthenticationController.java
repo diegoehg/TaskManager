@@ -41,11 +41,11 @@ public class AuthenticationController {
         String username = request.username();
         String password = request.password();
 
-        // TODO: Replace with actual user authentication logic against a database
-        if (username.equals("user@example.com") && password.equals("Password123!")) {
+        User user = userAccountService.validateUserAccount(request.username(), request.password());
+        if (user != null) {
             // TODO Implement session management - login
             // Successful authentication
-            String accessToken = generateJwtToken(username); // Implement JWT token generation
+            String accessToken = generateJwtToken(user); // Implement JWT token generation
             String refreshToken = generateRefreshToken(); // Implement refresh token generation
 
             LoginResponse loginResponse = new LoginResponse(accessToken, "Bearer", JWT_EXPIRATION_TIME, refreshToken);
@@ -82,7 +82,7 @@ public class AuthenticationController {
     }
 
     // TODO: Implement these methods for JWT and refresh token generation
-    private String generateJwtToken(String username) {
+    private String generateJwtToken(User user) {
         return "generated-jwt-token";
     }
 

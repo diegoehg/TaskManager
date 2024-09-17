@@ -76,6 +76,10 @@ public class AuthenticationControllerTest {
     @Test
     public void testLogin_ValidCredentials_ReturnsOk() throws Exception {
         AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("user@example.com", "Password123!");
+
+        when(userAccountService.validateUserAccount(request.username() , request.password()))
+                .thenReturn(new User(1L, request.username()));
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
