@@ -1,5 +1,6 @@
 package com.encora.taskmanager.service;
 
+import com.encora.taskmanager.exception.InvalidCredentialsException;
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
@@ -60,6 +61,16 @@ public class UserAccountServiceImplTest {
 
         assertNotNull(validatedUser);
         assertEquals("testuser", validatedUser.username());
+    }
+
+    @Test
+    void testValidateUserAccount_NoUserFound() {
+        when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(InvalidCredentialsException.class, () ->
+                userAccountService.validateUserAccount("testuser", "password")
+        );
+        assertEquals("No user found with those credentials", exception.getMessage());
     }
 
     @Test
