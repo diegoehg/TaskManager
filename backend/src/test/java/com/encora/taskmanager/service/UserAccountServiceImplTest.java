@@ -37,7 +37,7 @@ public class UserAccountServiceImplTest {
     @Test
     void testRegisterUser_Successful() {
         UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 0, null);
-        User user = new User(1L, "testuser", "password");
+        User user = new User(1L, "testuser");
 
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userAccountRepository.save(any(UserAccount.class))).thenReturn(userAccount);
@@ -51,7 +51,7 @@ public class UserAccountServiceImplTest {
     @Test
     void testValidateUserAccount_Successful() {
         UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 0, null);
-        User user = new User(1L, "testuser", "password");
+        User user = new User(1L, "testuser");
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));

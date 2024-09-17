@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public record User(
         @Id
         Long id,
-        String username,
-        String password
+        String username
 ) {
 }

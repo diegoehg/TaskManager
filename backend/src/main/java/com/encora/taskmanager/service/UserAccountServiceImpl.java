@@ -28,7 +28,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Override
     public User registerUser(UserAccount userAccount) {
         try {
-            User user = new User(null, userAccount.getUsername(), null);
+            User user = new User(null, userAccount.getUsername());
             user = userRepository.save(user);
             userAccount.setUserId(user.id());
             userAccountRepository.save(userAccount);
