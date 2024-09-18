@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.CredentialNotFoundException;
+import javax.security.auth.login.FailedLoginException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +39,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GenericResponse<LoginResponse>> login(@Valid @RequestBody AuthenticationCredentialsRequest request) throws CredentialNotFoundException {
+    public ResponseEntity<GenericResponse<LoginResponse>> login(@Valid @RequestBody AuthenticationCredentialsRequest request)
+            throws CredentialNotFoundException, FailedLoginException {
         String username = request.username();
         String password = request.password();
 

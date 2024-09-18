@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.CredentialNotFoundException;
+import javax.security.auth.login.FailedLoginException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -63,7 +64,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public User validateUserAccount(String username, String password) throws CredentialNotFoundException {
+    public User validateUserAccount(String username, String password) throws CredentialNotFoundException, FailedLoginException {
         UserAccount userAccount = findByUsername(username)
                 .orElseThrow(() -> new CredentialNotFoundException("No user found with those credentials"));
 
@@ -74,10 +75,10 @@ public class UserAccountServiceImpl implements UserAccountService {
         if (userAccount.getPassword().equals(password)) {
             resetFailedLoginAttempts(userAccount);
             return userRepository.findById(userAccount.getUserId())
-                    .orElseThrow(() -> new TaskManagerException("No user found with those credentials", null));
+                    .orElseThrow(() -> new CredentialNotFoundException("No user found with those credentials"));
         } else {
             handleFailedLoginAttempt(userAccount);
-            throw new TaskManagerException("Invalid username or password", null);
+            throw new FailedLoginException("Invalid username or password");
         }
     }
 
