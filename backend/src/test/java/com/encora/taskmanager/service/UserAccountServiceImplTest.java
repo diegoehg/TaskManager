@@ -1,6 +1,5 @@
 package com.encora.taskmanager.service;
 
-import com.encora.taskmanager.exception.AccountLockedException;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
 import com.encora.taskmanager.repository.UserAccountRepository;
@@ -11,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.CredentialNotFoundException;
 import javax.security.auth.login.FailedLoginException;
 import java.time.LocalDateTime;

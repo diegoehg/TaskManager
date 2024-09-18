@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.CredentialNotFoundException;
 import javax.security.auth.login.FailedLoginException;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<GenericResponse<LoginResponse>> login(@Valid @RequestBody AuthenticationCredentialsRequest request)
-            throws CredentialNotFoundException, FailedLoginException {
+            throws CredentialNotFoundException, FailedLoginException, AccountLockedException {
         String username = request.username();
         String password = request.password();
 
