@@ -27,4 +27,14 @@ public class UserServiceImpl implements UserService {
             throw new TaskManagerException("Error retrieving user", e);
         }
     }
+
+    @Override
+    public User createUser(User user) {
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            LOGGER.error("Error saving user: {}", user, e);
+            throw new TaskManagerException("Error saving user", e);
+        }
+    }
 }
