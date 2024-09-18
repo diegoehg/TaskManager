@@ -36,24 +36,18 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GenericResponse<LoginResponse>> login(@Valid @RequestBody AuthenticationCredentialsRequest request)
+    public ResponseEntity<GenericResponse<LoginResponse>> login(@RequestBody AuthenticationCredentialsRequest request)
             throws CredentialNotFoundException, FailedLoginException, AccountLockedException {
         User user = userAccountService.validateUserAccount(request.username(), request.password());
 
-        if (user != null) {
-            // TODO Implement session management - login
-            // Successful authentication
-            String accessToken = generateJwtToken(user); // Implement JWT token generation
-            String refreshToken = generateRefreshToken(); // Implement refresh token generation
+        // TODO Implement session management - login
+        // Successful authentication
+        String accessToken = generateJwtToken(user); // Implement JWT token generation
+        String refreshToken = generateRefreshToken(); // Implement refresh token generation
 
-            LoginResponse loginResponse = new LoginResponse(accessToken, "Bearer", JWT_EXPIRATION_TIME, refreshToken);
-            GenericResponse<LoginResponse> response = new GenericResponse<>(GenericResponse.Status.SUCCESS, "Authentication successful", loginResponse);
-            return ResponseEntity.ok(response);
-        } else {
-            // Authentication failed
-            GenericResponse<LoginResponse> response = new GenericResponse<>(GenericResponse.Status.FAILED, "Authentication not authorized", null);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
+        LoginResponse loginResponse = new LoginResponse(accessToken, "Bearer", JWT_EXPIRATION_TIME, refreshToken);
+        GenericResponse<LoginResponse> response = new GenericResponse<>(GenericResponse.Status.SUCCESS, "Authentication successful", loginResponse);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
