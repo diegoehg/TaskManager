@@ -3,6 +3,7 @@ package com.encora.taskmanager.service;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
 
+import javax.security.auth.login.CredentialNotFoundException;
 import java.util.Optional;
 
 public interface UserAccountService {
@@ -12,5 +13,5 @@ public interface UserAccountService {
 
     UserAccount saveUserAccount(UserAccount userAccount);
 
-    User validateUserAccount(String username, String password);
+    User validateUserAccount(String username, String password) throws CredentialNotFoundException;
 }

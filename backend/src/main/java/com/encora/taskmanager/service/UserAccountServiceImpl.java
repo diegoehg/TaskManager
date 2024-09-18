@@ -1,7 +1,6 @@
 package com.encora.taskmanager.service;
 
 import com.encora.taskmanager.exception.AccountLockedException;
-import com.encora.taskmanager.exception.InvalidCredentialsException;
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.CredentialNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -63,9 +63,9 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public User validateUserAccount(String username, String password) {
+    public User validateUserAccount(String username, String password) throws CredentialNotFoundException {
         UserAccount userAccount = findByUsername(username)
-                .orElseThrow(() -> new InvalidCredentialsException("No user found with those credentials"));
+                .orElseThrow(() -> new CredentialNotFoundException("No user found with those credentials"));
 
         if (isUserAccountLocked(userAccount)) {
             throw new AccountLockedException("Account locked. Please try again 15 minutes later.");

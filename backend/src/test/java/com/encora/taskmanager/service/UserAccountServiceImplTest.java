@@ -1,7 +1,6 @@
 package com.encora.taskmanager.service;
 
 import com.encora.taskmanager.exception.AccountLockedException;
-import com.encora.taskmanager.exception.InvalidCredentialsException;
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
@@ -13,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.security.auth.login.CredentialNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -51,7 +51,7 @@ public class UserAccountServiceImplTest {
     }
 
     @Test
-    void testValidateUserAccount_Successful() {
+    void testValidateUserAccount_Successful() throws Exception {
         UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 0, null);
         User user = new User(1L, "testuser");
 
@@ -68,7 +68,7 @@ public class UserAccountServiceImplTest {
     void testValidateUserAccount_NoUserFound() {
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(InvalidCredentialsException.class, () ->
+        Exception exception = assertThrows(CredentialNotFoundException.class, () ->
                 userAccountService.validateUserAccount("testuser", "password")
         );
         assertEquals("No user found with those credentials", exception.getMessage());
