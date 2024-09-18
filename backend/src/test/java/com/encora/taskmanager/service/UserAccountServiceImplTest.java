@@ -3,7 +3,6 @@ package com.encora.taskmanager.service;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
 import com.encora.taskmanager.repository.UserAccountRepository;
-import com.encora.taskmanager.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,7 +22,7 @@ import static org.mockito.Mockito.when;
 public class UserAccountServiceImplTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Mock
     private UserAccountRepository userAccountRepository;
@@ -41,7 +40,7 @@ public class UserAccountServiceImplTest {
         UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 0, null);
         User user = new User(1L, "testuser");
 
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userService.createUser(any(User.class))).thenReturn(user);
         when(userAccountRepository.save(any(UserAccount.class))).thenReturn(userAccount);
 
         User registeredUser = userAccountService.registerUser(userAccount);
@@ -56,7 +55,7 @@ public class UserAccountServiceImplTest {
         User user = new User(1L, "testuser");
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userService.getUserById(1L)).thenReturn(Optional.of(user));
 
         User validatedUser = userAccountService.validateUserAccount("testuser", "password");
 

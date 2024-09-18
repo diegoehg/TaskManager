@@ -4,7 +4,6 @@ import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
 import com.encora.taskmanager.repository.UserAccountRepository;
-import com.encora.taskmanager.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +26,13 @@ public class UserAccountServiceImpl implements UserAccountService {
     private UserAccountRepository userAccountRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Override
     public User registerUser(UserAccount userAccount) {
         try {
             User user = new User(null, userAccount.getUsername());
-            user = userRepository.save(user);
+            user = userService.createUser(user);
             userAccount.setUserId(user.id());
             userAccountRepository.save(userAccount);
             return user;
@@ -75,7 +74,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
         if (userAccount.getPassword().equals(password)) {
             resetFailedLoginAttempts(userAccount);
-            return userRepository.findById(userAccount.getUserId())
+            return userService.getUserById(userAccount.getUserId())
                     .orElseThrow(() -> new CredentialNotFoundException("No user found with those credentials"));
         } else {
             handleFailedLoginAttempt(userAccount);
