@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import javax.security.auth.login.CredentialNotFoundException;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
@@ -109,6 +110,20 @@ public class AuthenticationControllerTest {
                 Arguments.of(new AuthenticationCredentialsRequest("user@example.com", "wrongPassword123!"))
 
         );
+    }
+
+    @Test
+    public void testLogin_CredentialNotFound_ReturnsUnauthorized() throws Exception {
+        AuthenticationCredentialsRequest unexistentCredentials = new AuthenticationCredentialsRequest("user@example.com", "Password123$");
+        when(userAccountService.validateUserAccount(unexistentCredentials.username(), unexistentCredentials.password()))
+                .thenThrow(new CredentialNotFoundException("No user found with those credentials"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(unexistentCredentials)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
+                .andExpect(jsonPath("$.message").value("No user found with those credentials"));
     }
 
     @Test

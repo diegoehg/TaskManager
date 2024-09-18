@@ -119,4 +119,14 @@ public class AuthenticationController {
         );
         return ResponseEntity.badRequest().body(response);
     }
+
+    @ExceptionHandler(CredentialNotFoundException.class)
+    public ResponseEntity<GenericResponse<Void>> handleCredentialNotFoundException(CredentialNotFoundException ex) {
+        GenericResponse<Void> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                ex.getMessage(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 }
