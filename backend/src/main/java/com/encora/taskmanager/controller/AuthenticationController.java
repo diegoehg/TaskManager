@@ -129,4 +129,14 @@ public class AuthenticationController {
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<GenericResponse<Void>> handleAccountLockedException(AccountLockedException ex) {
+        GenericResponse<Void> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                ex.getMessage(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 }

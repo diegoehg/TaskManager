@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.CredentialNotFoundException;
 import java.util.stream.Stream;
 
@@ -124,6 +125,21 @@ public class AuthenticationControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
                 .andExpect(jsonPath("$.message").value("No user found with those credentials"));
+    }
+
+    @Test
+    public void testLogin_AccountLocked_ReturnsUnauthorized() throws Exception {
+        AuthenticationCredentialsRequest lockedCredentials = new AuthenticationCredentialsRequest("user@example.com", "Password123!");
+        when(userAccountService.validateUserAccount(lockedCredentials.username(), lockedCredentials.password()))
+                .thenThrow(new AccountLockedException("Account locked. Please try again 15 minutes later."));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lockedCredentials)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
+                .andExpect(jsonPath("$.message").value("Account locked. Please try again 15 minutes later."))
+                .andExpect(jsonPath("$.data").doesNotExist());
     }
 
     @Test
