@@ -143,28 +143,6 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    public void testLogin_TooManyInvalidAttempts_ReturnsUnauthorized() throws Exception {
-        AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("user@example.com", "wrongPassword123!");
-
-        // Perform multiple invalid login attempts
-        for (int i = 0; i < AuthenticationController.MAX_INVALID_ATTEMPTS; i++) {
-            mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnauthorized())
-                    .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()));
-        }
-
-        // Attempt to log in again (should be blocked)
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
-                .andExpect(jsonPath("$.message").value("Authentication not authorized"));
-    }
-
-    @Test
     public void testLogout_ValidJwt_ReturnsOk() throws Exception {
         String username = "user@example.com";
         String jwtToken = "valid-jwt-token " + username; // Replace with actual token generation

@@ -13,15 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.CredentialNotFoundException;
 import javax.security.auth.login.FailedLoginException;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
-    private final Map<String, Integer> invalidLoginAttempts = new HashMap<>();
-    public static final int MAX_INVALID_ATTEMPTS = 3;
     private static final long JWT_EXPIRATION_TIME = 3600;
 
     @Autowired
@@ -42,10 +38,8 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<GenericResponse<LoginResponse>> login(@Valid @RequestBody AuthenticationCredentialsRequest request)
             throws CredentialNotFoundException, FailedLoginException, AccountLockedException {
-        String username = request.username();
-        String password = request.password();
-
         User user = userAccountService.validateUserAccount(request.username(), request.password());
+
         if (user != null) {
             // TODO Implement session management - login
             // Successful authentication
@@ -57,17 +51,8 @@ public class AuthenticationController {
             return ResponseEntity.ok(response);
         } else {
             // Authentication failed
-            handleInvalidLoginAttempt(username);
             GenericResponse<LoginResponse> response = new GenericResponse<>(GenericResponse.Status.FAILED, "Authentication not authorized", null);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-    }
-
-    private void handleInvalidLoginAttempt(String username) {
-        invalidLoginAttempts.put(username, invalidLoginAttempts.getOrDefault(username, 0) + 1);
-        if (invalidLoginAttempts.get(username) >= MAX_INVALID_ATTEMPTS) {
-            // TODO: Implement logic to block user or take other security measures
-            System.out.println("User " + username + " blocked after too many invalid attempts.");
         }
     }
 
@@ -76,7 +61,6 @@ public class AuthenticationController {
         String username = extractUsernameFromJwt(request); // Implement JWT extraction logic
         if (username != null) {
             // TODO Implement session management - logout
-            invalidLoginAttempts.remove(username);
             GenericResponse<Void> response = new GenericResponse<>(GenericResponse.Status.SUCCESS, "Logout successful", null);
             return ResponseEntity.ok(response);
         } else {
