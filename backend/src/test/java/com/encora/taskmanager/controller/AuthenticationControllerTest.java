@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.CredentialNotFoundException;
+import javax.security.auth.login.FailedLoginException;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
@@ -139,6 +140,22 @@ public class AuthenticationControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
                 .andExpect(jsonPath("$.message").value("Account locked. Please try again 15 minutes later."))
+                .andExpect(jsonPath("$.data").doesNotExist());
+    }
+
+    @Test
+    public void testLogin_FailedLogin_ReturnsUnauthorized() throws Exception {
+        AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("user@example.com", "wrongPassword123$");
+
+        when(userAccountService.validateUserAccount(request.username(), request.password()))
+                .thenThrow(new FailedLoginException("Invalid username or password"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(GenericResponse.Status.FAILED.name()))
+                .andExpect(jsonPath("$.message").value("Invalid username or password"))
                 .andExpect(jsonPath("$.data").doesNotExist());
     }
 

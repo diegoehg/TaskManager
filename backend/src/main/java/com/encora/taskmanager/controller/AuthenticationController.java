@@ -123,4 +123,14 @@ public class AuthenticationController {
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+
+    @ExceptionHandler(FailedLoginException.class)
+    public ResponseEntity<GenericResponse<Void>> handleFailedLoginException(FailedLoginException ex) {
+        GenericResponse<Void> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                ex.getMessage(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 }
