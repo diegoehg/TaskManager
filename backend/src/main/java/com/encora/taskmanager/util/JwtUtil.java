@@ -9,7 +9,9 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor("PUT_A_SECRET_KEY_HERE".getBytes());
+    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor("""
+            Put your secret key here, this is just a placeholder.
+            """.getBytes());
 
     private static final long JWT_EXPIRATION_TIME = 3_600_000;
 
