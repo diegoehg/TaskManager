@@ -5,6 +5,7 @@ import com.encora.taskmanager.model.GenericResponse;
 import com.encora.taskmanager.model.User;
 import com.encora.taskmanager.model.UserAccount;
 import com.encora.taskmanager.service.UserAccountService;
+import com.encora.taskmanager.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,6 +33,9 @@ public class AuthenticationControllerTest {
 
     @MockBean
     private UserAccountService userAccountService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -79,6 +83,7 @@ public class AuthenticationControllerTest {
 
         when(userAccountService.validateUserAccount(request.username() , request.password()))
                 .thenReturn(new User(1L, request.username()));
+        when(jwtUtil.generateToken(request.username())).thenReturn("generated-jwt-token");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

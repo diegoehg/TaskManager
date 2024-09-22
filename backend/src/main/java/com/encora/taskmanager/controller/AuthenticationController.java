@@ -2,6 +2,7 @@ package com.encora.taskmanager.controller;
 
 import com.encora.taskmanager.model.*;
 import com.encora.taskmanager.service.UserAccountService;
+import com.encora.taskmanager.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class AuthenticationController {
     @Autowired
     private UserAccountService userAccountService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/signup")
     public ResponseEntity<GenericResponse<Void>> signup(@Valid @RequestBody AuthenticationCredentialsRequest request) {
         userAccountService.registerUser(new UserAccount(null, request.username(), request.password(), null, 0, null));
@@ -40,10 +44,8 @@ public class AuthenticationController {
             throws CredentialNotFoundException, FailedLoginException, AccountLockedException {
         User user = userAccountService.validateUserAccount(request.username(), request.password());
 
-        // TODO Implement session management - login
-        // Successful authentication
-        String accessToken = generateJwtToken(user); // Implement JWT token generation
-        String refreshToken = generateRefreshToken(); // Implement refresh token generation
+        String accessToken = jwtUtil.generateToken(user.username());
+        String refreshToken = generateRefreshToken();
 
         LoginResponse loginResponse = new LoginResponse(accessToken, "Bearer", JWT_EXPIRATION_TIME, refreshToken);
         GenericResponse<LoginResponse> response = new GenericResponse<>(GenericResponse.Status.SUCCESS, "Authentication successful", loginResponse);
@@ -63,11 +65,7 @@ public class AuthenticationController {
         }
     }
 
-    // TODO: Implement these methods for JWT and refresh token generation
-    private String generateJwtToken(User user) {
-        return "generated-jwt-token";
-    }
-
+    // TODO: Implement this methods for refresh token generation
     private String generateRefreshToken() {
         return "generated-refresh-token";
     }
