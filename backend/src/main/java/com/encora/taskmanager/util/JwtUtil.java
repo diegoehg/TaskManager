@@ -37,4 +37,9 @@ public class JwtUtil {
 
         return payload.getSubject();
     }
+
+    public boolean validateToken(String username, String token) {
+        String extractedUsername = extractUsernameFromToken(token);
+        return username.equals(extractedUsername);
+    }
 }
