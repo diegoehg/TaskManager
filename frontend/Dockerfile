@@ -15,6 +15,7 @@ RUN npm install
 
 # Copy the rest of the frontend application code
 COPY ./index.* .
+COPY ./src/ src/
 
 # Build the React application
 RUN npm run build
