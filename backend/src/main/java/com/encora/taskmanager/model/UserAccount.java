@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Document("userAccounts")
 public class UserAccount {
     @Id
-    private Long id;
+    private String id;
 
     private String username;
 
@@ -20,7 +20,7 @@ public class UserAccount {
 
     private LocalDateTime timeAfterOtherAttempt;
 
-    public UserAccount(Long id, String username, String password, Long userId, int failedLoginAttempts, LocalDateTime timeAfterOtherAttempt) {
+    public UserAccount(String id, String username, String password, Long userId, int failedLoginAttempts, LocalDateTime timeAfterOtherAttempt) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -29,11 +29,11 @@ public class UserAccount {
         this.timeAfterOtherAttempt = timeAfterOtherAttempt;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -37,7 +37,7 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testRegisterUser_Successful() {
-        UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 0, null);
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 0, null);
         User user = new User(1L, "testuser");
 
         when(userService.createUser(any(User.class))).thenReturn(user);
@@ -51,7 +51,7 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testValidateUserAccount_Successful() throws Exception {
-        UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 0, null);
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 0, null);
         User user = new User(1L, "testuser");
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
@@ -75,7 +75,7 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testValidateUserAccount_InvalidPassword() {
-        UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 0, null);
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 0, null);
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
 
@@ -87,7 +87,7 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testValidateUserAccount_AccountLocked() {
-        UserAccount userAccount = new UserAccount(1L, "testuser", "password", 1L, 3, LocalDateTime.now().plusMinutes(10));
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 3, LocalDateTime.now().plusMinutes(10));
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
 
