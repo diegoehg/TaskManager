@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> getUserById(String id) {
         try {
             return userRepository.findById(id);
         } catch (Exception e) {

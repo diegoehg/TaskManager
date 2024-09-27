@@ -14,13 +14,13 @@ public class UserAccount {
 
     private String password;
 
-    private Long userId;
+    private String userId;
 
     private int failedLoginAttempts;
 
     private LocalDateTime timeAfterOtherAttempt;
 
-    public UserAccount(String id, String username, String password, Long userId, int failedLoginAttempts, LocalDateTime timeAfterOtherAttempt) {
+    public UserAccount(String id, String username, String password, String userId, int failedLoginAttempts, LocalDateTime timeAfterOtherAttempt) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -53,11 +53,11 @@ public class UserAccount {
         this.password = password;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

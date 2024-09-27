@@ -37,8 +37,8 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testRegisterUser_Successful() {
-        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 0, null);
-        User user = new User(1L, "testuser");
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", "1", 0, null);
+        User user = new User("1", "testuser");
 
         when(userService.createUser(any(User.class))).thenReturn(user);
         when(userAccountRepository.save(any(UserAccount.class))).thenReturn(userAccount);
@@ -51,11 +51,11 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testValidateUserAccount_Successful() throws Exception {
-        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 0, null);
-        User user = new User(1L, "testuser");
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", "1", 0, null);
+        User user = new User("1", "testuser");
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
-        when(userService.getUserById(1L)).thenReturn(Optional.of(user));
+        when(userService.getUserById("1")).thenReturn(Optional.of(user));
 
         User validatedUser = userAccountService.validateUserAccount("testuser", "password");
 
@@ -75,7 +75,7 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testValidateUserAccount_InvalidPassword() {
-        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 0, null);
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", "1", 0, null);
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
 
@@ -87,7 +87,7 @@ public class UserAccountServiceImplTest {
 
     @Test
     void testValidateUserAccount_AccountLocked() {
-        UserAccount userAccount = new UserAccount("1", "testuser", "password", 1L, 3, LocalDateTime.now().plusMinutes(10));
+        UserAccount userAccount = new UserAccount("1", "testuser", "password", "1", 3, LocalDateTime.now().plusMinutes(10));
 
         when(userAccountRepository.findByUsername("testuser")).thenReturn(Optional.of(userAccount));
 

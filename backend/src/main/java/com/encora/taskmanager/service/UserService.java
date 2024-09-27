@@ -5,7 +5,7 @@ import com.encora.taskmanager.model.User;
 import java.util.Optional;
 
 public interface UserService {
-    Optional<User> getUserById(Long id);
+    Optional<User> getUserById(String id);
 
     User createUser(User user);
 }

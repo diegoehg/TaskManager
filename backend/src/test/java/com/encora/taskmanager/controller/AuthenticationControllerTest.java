@@ -43,7 +43,7 @@ public class AuthenticationControllerTest {
     @Test
     public void testSignup_ValidPassword_ReturnsCreated() throws Exception {
         AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("test@example.com", "Password123!");
-        User user = new User(1L, request.username());
+        User user = new User("1", request.username());
 
         when(userAccountService.registerUser(new UserAccount(null, request.username(), request.password(), null, 0, null)))
                 .thenReturn(user);
@@ -82,7 +82,7 @@ public class AuthenticationControllerTest {
         AuthenticationCredentialsRequest request = new AuthenticationCredentialsRequest("user@example.com", "Password123!");
 
         when(userAccountService.validateUserAccount(request.username() , request.password()))
-                .thenReturn(new User(1L, request.username()));
+                .thenReturn(new User("1", request.username()));
         when(jwtUtil.generateToken(request.username())).thenReturn("generated-jwt-token");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
