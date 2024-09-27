@@ -66,7 +66,7 @@ public class TaskController {
     }
 
     @GetMapping("/tasks/{id}")
-    public ResponseEntity<GenericResponse<Task>> getTaskById(@PathVariable Long id) {
+    public ResponseEntity<GenericResponse<Task>> getTaskById(@PathVariable String id) {
         Optional<Task> task = taskService.getTaskById(id);
         if (task.isPresent()) {
             GenericResponse<Task> response = new GenericResponse<>(
@@ -92,7 +92,7 @@ public class TaskController {
     }
 
     @PutMapping("/tasks/{id}")
-    public ResponseEntity<GenericResponse<Task>> updateTask(@PathVariable Long id, @Valid @RequestBody Task task) {
+    public ResponseEntity<GenericResponse<Task>> updateTask(@PathVariable String id, @Valid @RequestBody Task task) {
         Optional<Task> existingTask = taskService.getTaskById(task.id());
         if (existingTask.isPresent()) {
             Task updatedTask = taskService.updateTask(task);
@@ -108,7 +108,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/tasks/{id}")
-    public ResponseEntity<GenericResponse<Void>> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<GenericResponse<Void>> deleteTask(@PathVariable String id) {
         Optional<Task> existingTask = taskService.getTaskById(id);
         if (existingTask.isPresent()) {
             taskService.deleteTask(id);
@@ -123,7 +123,7 @@ public class TaskController {
         }
     }
 
-    private <T> ResponseEntity<GenericResponse<T>> handleTaskNotFound(Long id, Class<T> type) {
+    private <T> ResponseEntity<GenericResponse<T>> handleTaskNotFound(String id, Class<T> type) {
         GenericResponse<T> response = new GenericResponse<>(
                 GenericResponse.Status.FAILED,
                 "Task not found with ID: " + id,

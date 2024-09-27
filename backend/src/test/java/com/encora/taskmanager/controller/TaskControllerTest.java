@@ -44,8 +44,8 @@ public class TaskControllerTest {
         // Mock data
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
-                        new Task(2L, "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
+                        new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
+                        new Task("2", "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
                 ),
                 Pageable.ofSize(2).withPage(0),
                 10 // Total elements (assume 10 for this example)
@@ -82,8 +82,8 @@ public class TaskControllerTest {
         // Mock data for page 0, size 2
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
-                        new Task(2L, "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
+                        new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
+                        new Task("2", "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
                 ),
                 Pageable.ofSize(2).withPage(0),
                 10 // Total elements (assume 10 for this example)
@@ -109,8 +109,8 @@ public class TaskControllerTest {
         // Mock data for PENDING and IN_PROGRESS tasks
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
-                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.IN_PROGRESS)
+                        new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
+                        new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.IN_PROGRESS)
                 ),
                 Pageable.ofSize(10).withPage(0),
                 2 // Total elements
@@ -135,8 +135,8 @@ public class TaskControllerTest {
         LocalDate dueDateAfter = LocalDate.parse("2024-09-14");
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
-                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
+                        new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
                 ),
                 Pageable.ofSize(10).withPage(0),
                 2
@@ -159,8 +159,8 @@ public class TaskControllerTest {
         LocalDate dueDateBefore = LocalDate.parse("2024-12-25");
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
-                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS)
+                        new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
+                        new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS)
                 ),
                 Pageable.ofSize(10).withPage(0),
                 2
@@ -184,8 +184,8 @@ public class TaskControllerTest {
         LocalDate dueDateBefore = LocalDate.parse("2025-04-05");
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
-                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
+                        new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
                 ),
                 Pageable.ofSize(10).withPage(0),
                 2
@@ -208,9 +208,9 @@ public class TaskControllerTest {
     public void shouldReturnTasksSortedByDueDateAscending() throws Exception {
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
-                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
-                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
+                        new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
+                        new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
                 ),
                 Pageable.ofSize(10).withPage(0),
                 3
@@ -232,9 +232,9 @@ public class TaskControllerTest {
     public void shouldReturnTasksSortedByDueDateDescending() throws Exception {
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(3L, "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING),
-                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
-                        new Task(1L, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED)
+                        new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING),
+                        new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
+                        new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED)
                 ),
                 Pageable.ofSize(10).withPage(0),
                 3
@@ -259,7 +259,7 @@ public class TaskControllerTest {
 
         Page<Task> taskPage = new PageImpl<>(
                 List.of(
-                        new Task(2L, "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS)
+                        new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS)
                 ),
                 Pageable.ofSize(10).withPage(0),
                 1
@@ -290,7 +290,7 @@ public class TaskControllerTest {
 
     @Test
     public void shouldReturnTaskById() throws Exception {
-        long taskId = 1L;
+        String taskId = "1";
         Task task = new Task(taskId, "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED);
         when(taskService.getTaskById(taskId)).thenReturn(Optional.of(task));
 
@@ -305,7 +305,7 @@ public class TaskControllerTest {
 
     @Test
     public void shouldReturnNotFoundWhenTaskNotFound() throws Exception {
-        long taskId = 999L;
+        String taskId = "999";
         when(taskService.getTaskById(taskId)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/tasks/{id}", taskId)
@@ -319,7 +319,7 @@ public class TaskControllerTest {
     @Test
     public void shouldCreateTask() throws Exception {
         Task taskToCreate = new Task(null, "New Task", LocalDate.of(2024, 12, 31), Task.Status.PENDING);
-        Task createdTask = new Task(1L, "New Task", LocalDate.of(2024, 12, 31), Task.Status.PENDING);
+        Task createdTask = new Task("1", "New Task", LocalDate.of(2024, 12, 31), Task.Status.PENDING);
 
         when(taskService.createTask(taskToCreate)).thenReturn(createdTask);
 
@@ -353,10 +353,10 @@ public class TaskControllerTest {
 
     @Test
     public void shouldUpdateTask() throws Exception {
-        Task existingTask = new Task(1L, "Existing Task", LocalDate.of(2024, 12, 25), Task.Status.PENDING);
-        Task updatedTask = new Task(1L, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
+        Task existingTask = new Task("1", "Existing Task", LocalDate.of(2024, 12, 25), Task.Status.PENDING);
+        Task updatedTask = new Task("1", "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
 
-        when(taskService.getTaskById(1L)).thenReturn(Optional.of(existingTask));
+        when(taskService.getTaskById("1")).thenReturn(Optional.of(existingTask));
         when(taskService.updateTask(updatedTask)).thenReturn(updatedTask);
 
         mockMvc.perform(put("/api/tasks/{id}", 1L)
@@ -373,7 +373,7 @@ public class TaskControllerTest {
 
     @Test
     public void shouldReturnNotFoundWhenUpdatingNonExistingTask() throws Exception {
-        Long taskId = 999L;
+        String taskId = "999";
         Task updatedTask = new Task(taskId, "Updated Task", LocalDate.of(2025, 1, 1), Task.Status.IN_PROGRESS);
 
         when(taskService.getTaskById(taskId)).thenReturn(Optional.empty());
@@ -407,7 +407,7 @@ public class TaskControllerTest {
 
     @Test
     public void shouldDeleteTask() throws Exception {
-        long taskId = 1L;
+        String taskId = "1";
         when(taskService.getTaskById(taskId)).thenReturn(Optional.of(new Task(taskId, "Task 1", LocalDate.now(), Task.Status.PENDING)));
 
         mockMvc.perform(delete("/api/tasks/{id}", taskId))
@@ -419,7 +419,7 @@ public class TaskControllerTest {
 
     @Test
     public void shouldReturnNotFoundWhenDeletingNonExistingTask() throws Exception {
-        long taskId = 999L;
+        String taskId = "999";
         when(taskService.getTaskById(taskId)).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/tasks/{id}", taskId))

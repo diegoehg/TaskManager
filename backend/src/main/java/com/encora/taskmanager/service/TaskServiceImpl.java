@@ -76,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Optional<Task> getTaskById(Long id) {
+    public Optional<Task> getTaskById(String id) {
         try {
             return taskRepository.findById(id);
         } catch (Exception e) {
@@ -109,7 +109,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void deleteTask(Long id) {
+    public void deleteTask(String id) {
         try {
             taskRepository.deleteById(id);
         } catch (Exception e) {

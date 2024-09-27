@@ -10,11 +10,11 @@ import java.util.Optional;
 public interface TaskService {
     Page<Task> getAllTasks(TaskFilter taskFilter, Pageable pageable);
 
-    Optional<Task> getTaskById(Long id);
+    Optional<Task> getTaskById(String id);
 
     Task createTask(Task task);
 
     Task updateTask(Task task);
 
-    void deleteTask(Long id);
+    void deleteTask(String id);
 }
