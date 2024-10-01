@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function TaskList() {
+const TaskList = ({ onAddTask }) => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ function TaskList() {
     };
 
     fetchTasks();
-  }, []);
+  }, [onAddTask]);
 
   return (
     <div>
@@ -45,6 +45,6 @@ function TaskList() {
       </table>
     </div>
   );
-}
+};
 
 export default TaskList;

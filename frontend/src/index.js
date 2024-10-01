@@ -14,17 +14,39 @@ const App = () => {
         setShowAddTaskDialog(false);
     };
 
-    const handleAddTaskToTaskList = (newTask) => {
-        console.log('Adding task:', newTask);
-        setShowAddTaskDialog(false);
-    };
+    const refreshTasks = () => {};
+
+    const handleAddTaskToTaskList = async (newTask) => {
+        try {
+          const response = await fetch('http://localhost:9090/api/tasks', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              description: newTask.description,
+              dueDate: newTask.dueDate,
+              status: 'PENDING', 
+            }),
+          });
+    
+          if (!response.ok) {
+            throw new Error(`Failed to add task: ${response.status}`);
+          }
+    
+          handleCloseAddTaskDialog();
+          refreshTasks();
+        } catch (error) {
+          console.error('Error adding task:', error);
+        }
+      };
 
     return (
         <div>
             <h1>Task Manager</h1>
             <button onClick={handleAddTask}>Add New Task</button>
 
-            <TaskList />
+            <TaskList onAddTask={refreshTasks} />
             <TaskAddDialog
                 isOpen={showAddTaskDialog}
                 onClose={handleCloseAddTaskDialog}
