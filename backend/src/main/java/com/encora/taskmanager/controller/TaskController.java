@@ -141,7 +141,7 @@ public class TaskController {
                 ex.getMessage(),
                 null
         );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.internalServerError().body(response);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
