@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -81,14 +83,14 @@ public class TaskController {
     }
 
     @PostMapping("/tasks")
-    public ResponseEntity<GenericResponse<Task>> createTask(@Valid @RequestBody Task task) {
+    public ResponseEntity<GenericResponse<Task>> createTask(@Valid @RequestBody Task task) throws URISyntaxException {
         Task createdTask = taskService.createTask(task);
         GenericResponse<Task> response = new GenericResponse<>(
                 GenericResponse.Status.SUCCESS,
                 "Task created successfully",
                 createdTask
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.created(new URI("api/tasks/" + createdTask.id())).body(response);
     }
 
     @PutMapping("/tasks/{id}")
@@ -150,5 +152,15 @@ public class TaskController {
                 null
         );
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(URISyntaxException.class)
+    public ResponseEntity<GenericResponse<Void>> handleURISyntaxException(URISyntaxException ex) {
+        GenericResponse<Void> response = new GenericResponse<>(
+                GenericResponse.Status.FAILED,
+                "Invalid task ID.",
+                null
+        );
+        return ResponseEntity.internalServerError().body(response);
     }
 }
