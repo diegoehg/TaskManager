@@ -13,7 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -215,7 +214,7 @@ public class TaskControllerTest {
                 Pageable.ofSize(10).withPage(0),
                 3
         );
-        TaskFilter taskFilter = new TaskFilter(null, null, null, Sort.Direction.ASC);
+        TaskFilter taskFilter = new TaskFilter(null, null, null, TaskFilter.SortDirection.ASC);
         when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
                 .thenReturn(taskPage);
 
@@ -239,7 +238,7 @@ public class TaskControllerTest {
                 Pageable.ofSize(10).withPage(0),
                 3
         );
-        TaskFilter taskFilter = new TaskFilter(null, null, null, Sort.Direction.DESC);
+        TaskFilter taskFilter = new TaskFilter(null, null, null, TaskFilter.SortDirection.DESC);
         when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
                 .thenReturn(taskPage);
 
@@ -269,7 +268,7 @@ public class TaskControllerTest {
                 List.of(Task.Status.IN_PROGRESS),
                 dueDateAfter,
                 dueDateBefore,
-                Sort.Direction.ASC
+                TaskFilter.SortDirection.ASC
         );
         when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
                 .thenReturn(taskPage);

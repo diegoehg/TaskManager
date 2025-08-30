@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -83,7 +82,7 @@ public class TaskServiceImplTest {
 
         when(taskRepository.findAll()).thenReturn(List.of(task1, task2, task3));
 
-        TaskFilter taskFilter = new TaskFilter(null, null, null, Sort.Direction.ASC);
+        TaskFilter taskFilter = new TaskFilter(null, null, null, TaskFilter.SortDirection.ASC);
         Page<Task> result = taskService.getAllTasks(taskFilter, PageRequest.of(0, 10));
 
         assertEquals(3, result.getTotalElements());
@@ -98,7 +97,7 @@ public class TaskServiceImplTest {
 
         when(taskRepository.findAll()).thenReturn(List.of(task1, task2, task3));
 
-        TaskFilter taskFilter = new TaskFilter(null, null, null, Sort.Direction.DESC);
+        TaskFilter taskFilter = new TaskFilter(null, null, null, TaskFilter.SortDirection.DESC);
         Page<Task> result = taskService.getAllTasks(taskFilter, PageRequest.of(0, 10));
 
         assertEquals(3, result.getTotalElements());

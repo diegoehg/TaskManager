@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +40,7 @@ public class TaskController {
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         List<Task.Status> statuses = status != null ? convertToListStatus(status) : null;
-        Sort.Direction sortDirection = sort != null ? Sort.Direction.fromString(sort.toUpperCase()) : null;
+        TaskFilter.SortDirection sortDirection = sort != null ? TaskFilter.SortDirection.valueOf(sort.toUpperCase()) : null;
 
         TaskFilter taskFilter = new TaskFilter(
                 statuses,
