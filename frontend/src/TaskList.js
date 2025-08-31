@@ -11,7 +11,7 @@ const TaskList = ({ onAddTask }) => {
           throw new Error('Failed to fetch tasks');
         }
         const data = await response.json();
-        setTasks(data.data.content);
+        setTasks(data.data.items);
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
