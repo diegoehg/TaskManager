@@ -2,13 +2,12 @@ package com.encora.taskmanager.controller;
 
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.GenericResponse;
+import com.encora.taskmanager.model.PagedResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping(value = "/tasks")
-    public ResponseEntity<GenericResponse<Page<Task>>> getAllTasks(
+    public ResponseEntity<GenericResponse<PagedResponse<Task>>> getAllTasks(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "status", required = false) String status,
@@ -38,7 +37,6 @@ public class TaskController {
             @RequestParam(value = "dueDateBefore", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueDateBefore,
             @RequestParam(value = "sort", required = false) String sort
     ) {
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
         List<Task.Status> statuses = status != null ? convertToListStatus(status) : null;
         TaskFilter.SortDirection sortDirection = sort != null ? TaskFilter.SortDirection.valueOf(sort.toUpperCase()) : null;
 
@@ -49,9 +47,9 @@ public class TaskController {
                 sortDirection
         );
 
-        Page<Task> tasks = taskService.getAllTasks(taskFilter, pageable);
+        PagedResponse<Task> tasks = taskService.getAllTasks(taskFilter, page, size);
 
-        GenericResponse<Page<Task>> response = new GenericResponse<>(
+        GenericResponse<PagedResponse<Task>> response = new GenericResponse<>(
                 GenericResponse.Status.SUCCESS,
                 "Tasks retrieved successfully",
                 tasks

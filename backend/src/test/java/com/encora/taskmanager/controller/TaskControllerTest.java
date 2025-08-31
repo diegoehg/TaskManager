@@ -2,6 +2,7 @@ package com.encora.taskmanager.controller;
 
 import com.encora.taskmanager.exception.TaskManagerException;
 import com.encora.taskmanager.model.GenericResponse;
+import com.encora.taskmanager.model.PagedResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
@@ -10,9 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,6 +20,7 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -41,16 +40,15 @@ public class TaskControllerTest {
     @Test
     public void shouldReturnListOfTasks() throws Exception {
         // Mock data
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
                         new Task("2", "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
                 ),
-                Pageable.ofSize(2).withPage(0),
-                10 // Total elements (assume 10 for this example)
+                0, 10, 10
         );
         TaskFilter taskFilter = new TaskFilter(null, null, null, null);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         // Perform GET request
@@ -60,12 +58,12 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name())) // Verify status
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully")) // Verify message
-                .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks are returned in content
+                .andExpect(jsonPath("$.data.items", hasSize(2))); // Verify 2 tasks are returned in content
     }
 
     @Test
     public void shouldReturn500WhenServiceThrowsTaskManagerException() throws Exception {
-        when(taskService.getAllTasks(any(TaskFilter.class), any(Pageable.class)))
+        when(taskService.getAllTasks(any(TaskFilter.class), anyInt(), anyInt()))
                 .thenThrow(new TaskManagerException("Error retrieving tasks", new Exception("Exception")));
 
         mockMvc.perform(get("/api/tasks")
@@ -79,16 +77,15 @@ public class TaskControllerTest {
     @Test
     public void shouldReturnPaginatedListOfTasks() throws Exception {
         // Mock data for page 0, size 2
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
                         new Task("2", "Task 2", LocalDate.of(2024, 11, 24), Task.Status.IN_PROGRESS)
                 ),
-                Pageable.ofSize(2).withPage(0),
-                10 // Total elements (assume 10 for this example)
+                0, 2, 10
         );
         TaskFilter taskFilter = new TaskFilter(null, null, null, null);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(2).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 2))
                 .thenReturn(taskPage);
 
         // Perform GET request with pagination parameters
@@ -100,22 +97,21 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully"))
-                .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks in the page content
+                .andExpect(jsonPath("$.data.items", hasSize(2))); // Verify 2 tasks in the page content
     }
 
     @Test
     public void shouldReturnFilteredListOfTasks() throws Exception {
         // Mock data for PENDING and IN_PROGRESS tasks
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.PENDING),
                         new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.IN_PROGRESS)
                 ),
-                Pageable.ofSize(10).withPage(0),
-                2 // Total elements
+                0, 10, 2
         );
         TaskFilter taskFilter = new TaskFilter(List.of(Task.Status.PENDING, Task.Status.IN_PROGRESS), null, null, null);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         // Perform GET request with filtering by status
@@ -126,22 +122,21 @@ public class TaskControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
                 .andExpect(jsonPath("$.message").value("Tasks retrieved successfully"))
-                .andExpect(jsonPath("$.data.content", hasSize(2))); // Verify 2 tasks are returned
+                .andExpect(jsonPath("$.data.items", hasSize(2))); // Verify 2 tasks are returned
     }
 
     @Test
     public void shouldReturnTasksFilteredByDueDateAfter() throws Exception {
         LocalDate dueDateAfter = LocalDate.parse("2024-09-14");
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
                         new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
                 ),
-                Pageable.ofSize(10).withPage(0),
-                2
+                0, 10, 2
         );
         TaskFilter taskFilter = new TaskFilter(null, dueDateAfter, null, null);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         mockMvc.perform(get("/api/tasks")
@@ -150,22 +145,21 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
-                .andExpect(jsonPath("$.data.content", hasSize(2)));
+                .andExpect(jsonPath("$.data.items", hasSize(2)));
     }
 
     @Test
     public void shouldReturnTasksFilteredByDueDateBefore() throws Exception {
         LocalDate dueDateBefore = LocalDate.parse("2024-12-25");
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
                         new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS)
                 ),
-                Pageable.ofSize(10).withPage(0),
-                2
+                0, 10, 2
         );
         TaskFilter taskFilter = new TaskFilter(null, null, dueDateBefore, null);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         mockMvc.perform(get("/api/tasks")
@@ -174,23 +168,22 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
-                .andExpect(jsonPath("$.data.content", hasSize(2)));
+                .andExpect(jsonPath("$.data.items", hasSize(2)));
     }
 
     @Test
     public void shouldReturnTasksFilteredByDueDateBetween() throws Exception {
         LocalDate dueDateAfter = LocalDate.parse("2024-09-25");
         LocalDate dueDateBefore = LocalDate.parse("2025-04-05");
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
                         new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
                 ),
-                Pageable.ofSize(10).withPage(0),
-                2
+                0, 10, 2
         );
         TaskFilter taskFilter = new TaskFilter(null, dueDateAfter, dueDateBefore, null);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         mockMvc.perform(get("/api/tasks")
@@ -200,22 +193,21 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
-                .andExpect(jsonPath("$.data.content", hasSize(2)));
+                .andExpect(jsonPath("$.data.items", hasSize(2)));
     }
 
     @Test
     public void shouldReturnTasksSortedByDueDateAscending() throws Exception {
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED),
                         new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
                         new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING)
                 ),
-                Pageable.ofSize(10).withPage(0),
-                3
+                0, 10, 3
         );
         TaskFilter taskFilter = new TaskFilter(null, null, null, TaskFilter.SortDirection.ASC);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         mockMvc.perform(get("/api/tasks")
@@ -224,22 +216,21 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
-                .andExpect(jsonPath("$.data.content", hasSize(3)));
+                .andExpect(jsonPath("$.data.items", hasSize(3)));
     }
 
     @Test
     public void shouldReturnTasksSortedByDueDateDescending() throws Exception {
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("3", "Task 3", LocalDate.of(2024, 12, 31), Task.Status.PENDING),
                         new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS),
                         new Task("1", "Task 1", LocalDate.of(2024, 5, 7), Task.Status.COMPLETED)
                 ),
-                Pageable.ofSize(10).withPage(0),
-                3
+                0, 10, 3
         );
         TaskFilter taskFilter = new TaskFilter(null, null, null, TaskFilter.SortDirection.DESC);
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         mockMvc.perform(get("/api/tasks")
@@ -248,7 +239,7 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(GenericResponse.Status.SUCCESS.name()))
-                .andExpect(jsonPath("$.data.content", hasSize(3)));
+                .andExpect(jsonPath("$.data.items", hasSize(3)));
     }
 
     @Test
@@ -256,12 +247,11 @@ public class TaskControllerTest {
         LocalDate dueDateAfter = LocalDate.parse("2024-09-14");
         LocalDate dueDateBefore = LocalDate.parse("2024-12-25");
 
-        Page<Task> taskPage = new PageImpl<>(
+        PagedResponse<Task> taskPage = new PagedResponse<>(
                 List.of(
                         new Task("2", "Task 2", LocalDate.of(2024, 10, 15), Task.Status.IN_PROGRESS)
                 ),
-                Pageable.ofSize(10).withPage(0),
-                1
+                0, 10, 1
         );
 
         TaskFilter taskFilter = new TaskFilter(
@@ -270,7 +260,7 @@ public class TaskControllerTest {
                 dueDateBefore,
                 TaskFilter.SortDirection.ASC
         );
-        when(taskService.getAllTasks(taskFilter, Pageable.ofSize(10).withPage(0)))
+        when(taskService.getAllTasks(taskFilter, 0, 10))
                 .thenReturn(taskPage);
 
         mockMvc.perform(get("/api/tasks")
@@ -284,7 +274,7 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
-                .andExpect(jsonPath("$.data.content", hasSize(1)));
+                .andExpect(jsonPath("$.data.items", hasSize(1)));
     }
 
     @Test

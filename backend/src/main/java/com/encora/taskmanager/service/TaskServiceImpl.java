@@ -1,15 +1,13 @@
 package com.encora.taskmanager.service;
 
 import com.encora.taskmanager.exception.TaskManagerException;
+import com.encora.taskmanager.model.PagedResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -26,18 +24,20 @@ public class TaskServiceImpl implements TaskService {
     private TaskRepository taskRepository;
 
     @Override
-    public Page<Task> getAllTasks(TaskFilter taskFilter, Pageable pageable) {
+    public PagedResponse<Task> getAllTasks(TaskFilter taskFilter, int page, int size) {
         try {
+            long totalSize = taskRepository.count();
+
             List<Task> tasks = taskRepository.findAll().stream()
                     .filter(task -> filterTaskByStatus(task, taskFilter))
                     .filter(task -> filterByDueDateAfter(task, taskFilter))
                     .filter(task -> filterByDueDateBefore(task, taskFilter))
                     .sorted(getTaskComparator(taskFilter))
-                    .skip(pageable.getOffset())
-                    .limit(pageable.getPageSize())
+                    .skip((long) page * size)
+                    .limit(size)
                     .collect(Collectors.toList());
 
-            return new PageImpl<>(tasks, pageable, tasks.size());
+            return new PagedResponse<>(tasks, page, size, totalSize);
         } catch (Exception e) {
             final String message = "Error retrieving tasks";
             logger.error(message, e);

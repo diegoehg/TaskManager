@@ -1,14 +1,13 @@
 package com.encora.taskmanager.service;
 
+import com.encora.taskmanager.model.PagedResponse;
 import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
 public interface TaskService {
-    Page<Task> getAllTasks(TaskFilter taskFilter, Pageable pageable);
+    PagedResponse<Task> getAllTasks(TaskFilter taskFilter, int page, int size);
 
     Optional<Task> getTaskById(String id);
 
