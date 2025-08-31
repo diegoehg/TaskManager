@@ -164,7 +164,7 @@ The endpoint returns a JSON object with the following structure:
   "status": "SUCCESS" | "FAILED",
   "message": "string",
   "data": {
-    "content": [
+    "items": [
       {
         "id": "long",
         "description": "string",
@@ -172,31 +172,12 @@ The endpoint returns a JSON object with the following structure:
         "status": "PENDING" | "IN_PROGRESS" | "COMPLETED"
       }
     ],
-    "pageable": {
-      "sort": {
-        "sorted": "boolean",
-        "unsorted": "boolean",
-        "empty": "boolean"
-      },
-      "offset": "int",
-      "pageNumber": "int",
-      "pageSize": "int",
-      "paged": "boolean",
-      "unpaged": "boolean"
-    },
-    "last": "boolean",
-    "totalPages": "int",
-    "totalElements": "int",
+    "page": "int",
     "size": "int",
-    "number": "int",
-    "sort": {
-      "sorted": "boolean",
-      "unsorted": "boolean",
-      "empty": "boolean"
-    },
-    "first": "boolean",
-    "numberOfElements": "int",
-    "empty": "boolean"
+    "totalElements": "int",
+    "totalPages": "int",
+    "hasNext": "boolean",
+    "hasPrevious": "boolean"
   }
 }
 ```
