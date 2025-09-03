@@ -8,12 +8,17 @@ import com.encora.taskmanager.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -23,19 +28,16 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     @Override
     public PagedResponse<Task> getAllTasks(TaskFilter taskFilter, int page, int size) {
         try {
-            long totalSize = taskRepository.count();
-
-            List<Task> tasks = taskRepository.findAll().stream()
-                    .filter(task -> filterTaskByStatus(task, taskFilter))
-                    .filter(task -> filterByDueDateAfter(task, taskFilter))
-                    .filter(task -> filterByDueDateBefore(task, taskFilter))
-                    .sorted(getTaskComparator(taskFilter))
-                    .skip((long) page * size)
-                    .limit(size)
-                    .collect(Collectors.toList());
+            Criteria criteria = buildCriteria(taskFilter);
+            Pageable pageable = buildPageable(taskFilter, page, size);
+            List<Task> tasks = queryTasks(criteria, pageable);
+            long totalSize = queryTaskCount(criteria);
 
             return new PagedResponse<>(tasks, page, size, totalSize);
         } catch (Exception e) {
@@ -45,33 +47,62 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    private boolean filterTaskByStatus(Task task, TaskFilter taskFilter) {
-        return taskFilter.statuses() == null || taskFilter.statuses().isEmpty() ||
-                taskFilter.statuses().contains(task.status());
-    }
-
-    private boolean filterByDueDateAfter(Task task, TaskFilter taskFilter) {
-        return taskFilter.dueDateBefore() == null || task.dueDate().isAfter(taskFilter.dueDateAfter()) ||
-                task.dueDate().isEqual(taskFilter.dueDateAfter());
-    }
-
-    private boolean filterByDueDateBefore(Task task, TaskFilter taskFilter) {
-        return taskFilter.dueDateAfter() == null || task.dueDate().isBefore(taskFilter.dueDateBefore()) ||
-                task.dueDate().isEqual(taskFilter.dueDateBefore());
-    }
-
-    private Comparator<Task> getTaskComparator(TaskFilter taskFilter) {
-        if (taskFilter.sortDirection() == null) {
-            return Comparator.comparing(Task::id);
+    private Criteria buildCriteria(TaskFilter taskFilter) {
+        if (taskFilter == null) {
+            return null;
         }
 
-        Comparator<Task> dueDateComparator = Comparator.comparing(Task::dueDate);
+        // Build query criteria based on filters
+        List<Criteria> criteriaList = new ArrayList<>();
 
-        if (taskFilter.sortDirection() == TaskFilter.SortDirection.ASC) {
-            return dueDateComparator;
+        if (taskFilter.statuses() != null && !taskFilter.statuses().isEmpty()) {
+            criteriaList.add(Criteria.where("status").in(taskFilter.statuses()));
+        }
+        if (taskFilter.dueDateAfter() != null) {
+            criteriaList.add(Criteria.where("dueDate").gte(taskFilter.dueDateAfter()));
+        }
+        if (taskFilter.dueDateBefore() != null) {
+            criteriaList.add(Criteria.where("dueDate").lte(taskFilter.dueDateBefore()));
+        }
+        if (criteriaList.isEmpty()) {
+            return null;
         }
 
-        return dueDateComparator.reversed();
+        return new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
+    }
+
+    private Pageable buildPageable(TaskFilter taskFilter, int page, int size) {
+        // Sorting: default by id ascending; if sortDirection provided, sort by dueDate
+        Sort sort;
+        if (taskFilter != null && taskFilter.sortDirection() != null) {
+            sort = taskFilter.sortDirection() == TaskFilter.SortDirection.ASC
+                    ? Sort.by(Sort.Direction.ASC, "dueDate")
+                    : Sort.by(Sort.Direction.DESC, "dueDate");
+        } else {
+            sort = Sort.by(Sort.Direction.ASC, "id");
+        }
+
+        return PageRequest.of(page, size, sort);
+    }
+
+    private List<Task> queryTasks(Criteria criteria, Pageable pageable) {
+        Query query = new Query();
+        if (criteria != null) {
+            query.addCriteria(criteria);
+        }
+        query.with(pageable);
+
+        // Execute query for items
+        return mongoTemplate.find(query, Task.class);
+    }
+
+    private long queryTaskCount(Criteria criteria) {
+        // Build count query without pagination and sorting
+        Query countQuery = new Query();
+        if (criteria != null) {
+            countQuery.addCriteria(criteria);
+        }
+        return mongoTemplate.count(countQuery, Task.class);
     }
 
     @Override
