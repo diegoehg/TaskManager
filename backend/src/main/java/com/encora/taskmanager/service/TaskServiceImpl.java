@@ -7,7 +7,6 @@ import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,11 +24,14 @@ public class TaskServiceImpl implements TaskService {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
+
+    public TaskServiceImpl(TaskRepository taskRepository, MongoTemplate mongoTemplate) {
+        this.taskRepository = taskRepository;
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @Override
     public PagedResponse<Task> getAllTasks(TaskFilter taskFilter, int page, int size) {

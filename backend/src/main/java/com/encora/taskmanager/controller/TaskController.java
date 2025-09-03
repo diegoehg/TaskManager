@@ -7,7 +7,6 @@ import com.encora.taskmanager.model.Task;
 import com.encora.taskmanager.model.TaskFilter;
 import com.encora.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +24,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api")
 public class TaskController {
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
+
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     @GetMapping(value = "/tasks")
     public ResponseEntity<GenericResponse<PagedResponse<Task>>> getAllTasks(
